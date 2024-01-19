@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass Game</title>
+  <script src="../jsgame0.js"></script>
+  <style type="text/css" media="screen">
+body {
+  background-color: white;
+  color: black;
+}
+.hidden {
+  display: none;
+}
+#original {
+  margin-left: 1em;
+}
+  </style>
+</head>
+
+<body>
+<section id="imageLoader" class="hidden">
+  <img class="hidden" src="images/background_00.png" alt="background_00" data-name="background_00">
+  <img class="hidden" src="images/background_01.png" alt="background_01" data-name="background_01">
+  <img class="hidden" src="images/background_02.png" alt="background_02" data-name="background_02">
+  <img class="hidden" src="images/background_settings_01.png" alt="background_settings_01" data-name="background_settings_01">
+  <img class="hidden" src="images/obstacle_00.png" alt="obstacle_00" data-name="obstacle_00">
+  <img class="hidden" src="images/obstacle_01.png" alt="obstacle_01" data-name="obstacle_01">
+  <img class="hidden" src="images/obstacle_02.png" alt="obstacle_02" data-name="obstacle_02">
+  <img class="hidden" src="images/obstacle_03.png" alt="obstacle_03" data-name="obstacle_03">
+  <img class="hidden" src="images/obstacle_04.png" alt="obstacle_04" data-name="obstacle_04">
+  <img class="hidden" src="images/obstacle_05.png" alt="obstacle_05" data-name="obstacle_05">
+  <img class="hidden" src="images/obstacle_06.png" alt="obstacle_06" data-name="obstacle_06">
+  <img class="hidden" src="images/person_person1_00_down_01.png" alt="person_person1_00_down_01" data-name="person_person1_00_down_01">
+  <img class="hidden" src="images/person_person1_00_down_02.png" alt="person_person1_00_down_02" data-name="person_person1_00_down_02">
+  <img class="hidden" src="images/person_person1_00_down_03.png" alt="person_person1_00_down_03" data-name="person_person1_00_down_03">
+  <img class="hidden" src="images/person_person1_00_down_04.png" alt="person_person1_00_down_04" data-name="person_person1_00_down_04">
+  <img class="hidden" src="images/person_person1_00_duck_01.png" alt="person_person1_00_duck_01" data-name="person_person1_00_duck_01">
+  <img class="hidden" src="images/person_person1_00_jump_01.png" alt="person_person1_00_jump_01" data-name="person_person1_00_jump_01">
+  <img class="hidden" src="images/person_person1_00_left_01.png" alt="person_person1_00_left_01" data-name="person_person1_00_left_01">
+  <img class="hidden" src="images/person_person1_00_left_02.png" alt="person_person1_00_left_02" data-name="person_person1_00_left_02">
+  <img class="hidden" src="images/person_person1_00_left_03.png" alt="person_person1_00_left_03" data-name="person_person1_00_left_03">
+  <img class="hidden" src="images/person_person1_00_left_04.png" alt="person_person1_00_left_04" data-name="person_person1_00_left_04">
+  <img class="hidden" src="images/person_person1_00_right_01.png" alt="person_person1_00_right_01" data-name="person_person1_00_right_01">
+  <img class="hidden" src="images/person_person1_00_right_02.png" alt="person_person1_00_right_02" data-name="person_person1_00_right_02">
+  <img class="hidden" src="images/person_person1_00_right_03.png" alt="person_person1_00_right_03" data-name="person_person1_00_right_03">
+  <img class="hidden" src="images/person_person1_00_right_04.png" alt="person_person1_00_right_04" data-name="person_person1_00_right_04">
+  <img class="hidden" src="images/person_person1_00_up_01.png" alt="person_person1_00_up_01" data-name="person_person1_00_up_01">
+  <img class="hidden" src="images/person_person1_00_up_02.png" alt="person_person1_00_up_02" data-name="person_person1_00_up_02">
+  <img class="hidden" src="images/person_person1_00_up_03.png" alt="person_person1_00_up_03" data-name="person_person1_00_up_03">
+  <img class="hidden" src="images/person_person1_00_up_04.png" alt="person_person1_00_up_04" data-name="person_person1_00_up_04">
+  <img class="hidden" src="images/person_person2_00_down_01.png" alt="person_person2_00_down_01" data-name="person_person2_00_down_01">
+  <img class="hidden" src="images/person_person2_00_down_02.png" alt="person_person2_00_down_02" data-name="person_person2_00_down_02">
+  <img class="hidden" src="images/person_person2_00_down_03.png" alt="person_person2_00_down_03" data-name="person_person2_00_down_03">
+  <img class="hidden" src="images/person_person2_00_down_04.png" alt="person_person2_00_down_04" data-name="person_person2_00_down_04">
+  <img class="hidden" src="images/person_person2_00_duck_01.png" alt="person_person2_00_duck_01" data-name="person_person2_00_duck_01">
+  <img class="hidden" src="images/person_person2_00_jump_01.png" alt="person_person2_00_jump_01" data-name="person_person2_00_jump_01">
+  <img class="hidden" src="images/person_person2_00_left_01.png" alt="person_person2_00_left_01" data-name="person_person2_00_left_01">
+  <img class="hidden" src="images/person_person2_00_left_02.png" alt="person_person2_00_left_02" data-name="person_person2_00_left_02">
+  <img class="hidden" src="images/person_person2_00_left_03.png" alt="person_person2_00_left_03" data-name="person_person2_00_left_03">
+  <img class="hidden" src="images/person_person2_00_left_04.png" alt="person_person2_00_left_04" data-name="person_person2_00_left_04">
+  <img class="hidden" src="images/person_person2_00_right_01.png" alt="person_person2_00_right_01" data-name="person_person2_00_right_01">
+  <img class="hidden" src="images/person_person2_00_right_02.png" alt="person_person2_00_right_02" data-name="person_person2_00_right_02">
+  <img class="hidden" src="images/person_person2_00_right_03.png" alt="person_person2_00_right_03" data-name="person_person2_00_right_03">
+  <img class="hidden" src="images/person_person2_00_right_04.png" alt="person_person2_00_right_04" data-name="person_person2_00_right_04">
+  <img class="hidden" src="images/person_person2_00_up_01.png" alt="person_person2_00_up_01" data-name="person_person2_00_up_01">
+  <img class="hidden" src="images/person_person2_00_up_02.png" alt="person_person2_00_up_02" data-name="person_person2_00_up_02">
+  <img class="hidden" src="images/person_person2_00_up_03.png" alt="person_person2_00_up_03" data-name="person_person2_00_up_03">
+  <img class="hidden" src="images/person_person2_00_up_04.png" alt="person_person2_00_up_04" data-name="person_person2_00_up_04">
+</section>
+
+<main>
+<h1>Compass Game</h1>
+
+<canvas id="screen">
+The game screen appears here if your browser supports the Canvas API.
+</canvas>
+<section id="controls">
+  <button type="button" id="reset">Reset</button>
+  <button type="button" id="pause">Pause</button>
+</section>
+
+<h2>Attribution</h2>
+
+<p>Licensed under <a href="https://www.gnu.org/licenses/">GNU GENERAL PUBLIC LICENSE Version 3</a>.</p>
+
+<h2>Original Python code</h2>
+
+<pre id="original"><code>
+# Compass Game - PyGame Zero
+# This is licensed under GNU GENERAL PUBLIC LICENSE Version 3
+# See : hhttp://www.penguintutor.com/projects/compass-game
+
+# If running on a computer that doesn&#x27;t include . in the Python Search Path
+# Includes Raspbian on x86
+import sys
+sys.path.append(&#x27;.&#x27;)
+
+import math
+import os
+from os import listdir
+import pickle
+import random
+import re
+import subprocess
+import time
+
+import pygame
+from pygame import Surface, Rect
+import pgzero
+from pgzero.actor import Actor
+from pgzero.constants import keys as keycodes
+from pgzero.keyboard import *
+from pgzero.rect import Rect
+import yaml
+
+# Card is based on an Actor (uses inheritance)
+class PlayerActor(Actor):
+
+    # Status can be normal or hidden
+    status = &#x27;normal&#x27;
+    # Direction that player is facing
+    direction = &#x27;down&#x27;
+    # walking position of player (number from 1 to 4 represent position of feet)
+    player_step_position = 1
+    # num moves per step (ie don&#x27;t move feet if less than this)
+    # If set too low then legs will move really fast - default 5
+    step_delay = 5
+    # track number of moves per step
+    player_step_count = 0
+
+    # theme is image number
+    def __init__(self, theme, theme_num, player_image_format, screen_width, screen_height):
+        self.theme = theme
+        self.theme_num = theme_num
+        self.player_image_format = player_image_format
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        # Call Actor constructor (center the Actor)
+        Actor.__init__(self, self.getImage(), (self.screen_width / 2, self.screen_height / 2))
+
+
+
+    # Override Actor.draw
+    def draw(self):
+        if (self.status == &#x27;hidden&#x27;):
+            return
+        Actor.draw(self)
+
+    def hide(self):
+        self.status = &#x27;hidden&#x27;
+
+    # When unhide set it to back image
+    def unhide (self):
+        self.status = &#x27;normal&#x27;
+
+    def isHidden (self):
+        if self.status == &#x27;hidden&#x27;:
+            return True
+        return False
+
+    def reset (self):
+        self.unhide()
+
+    def toString(self):
+        return self.name
+
+    def setPosition(self, x, y):
+        self.x = x
+        self.y = y
+
+    # Sets direction and also resets player_step_count
+    def setDirection(self, direction):
+        self.direction = direction
+        self.player_step_count = 0
+        self.player_step_position = 1
+        self.image = self.getImage()
+
+    def getDirection(self):
+        return self.direction
+
+    def equals (self, othercard):
+        if self.name == othercard.toString():
+            return True
+        return False
+
+    # Move Actor also handles image change
+    def moveActor(self, direction, distance = 5):
+        if (direction == &#x27;up&#x27;):
+            self.y -= distance
+        if (direction == &#x27;right&#x27;):
+            self.x += distance
+        if (direction == &#x27;down&#x27;):
+            self.y += distance
+        if (direction == &#x27;left&#x27;):
+            self.x -= distance
+
+        # Check not moved past the edge of the screen
+        if (self.y &lt;= 30):
+            self.y = 30
+        if (self.x &lt;= 12):
+            self.x = 12
+        if (self.y &gt;= self.screen_height - 30):
+            self.y = self.screen_height - 30
+        if (self.x &gt;= self.screen_width - 12):
+            self.x = self.screen_width - 12
+
+    # gets image based on status of player
+    def getImage(self):
+        return self.player_image_format.format(self.theme, self.theme_num, self.direction, self.player_step_position)
+
+    def isJumpDuck(self):
+        if (self.direction == &#x27;jump&#x27; or self.direction == &#x27;duck&#x27;):
+            return True
+        return False
+
+    def updImage(self, new_direction):
+        # Check for duck and jump as don&#x27;t increment digit &amp; image - we just have one duck / jump image
+        if (self.direction == new_direction and (self.direction == &#x27;duck&#x27; or self.direction == &#x27;jump&#x27;)):
+            return
+
+        # If change in direction
+        if (self.direction != new_direction) :
+            self.player_step_count = 0
+        else :
+            self.player_step_count += 1
+
+        if (self.player_step_count &gt;= 4 * self.step_delay):
+            self.player_step_count = 0
+
+        # set the direction to be the new direction
+        self.direction = new_direction
+        self.player_step_position = math.floor(self.player_step_count / self.step_delay) +1
+        self.image = self.getImage()
+
+    # Theme and theme_num must be a tuple (which is what CustomCharacter.getTheme() returns)
+    def setTheme(self, theme_tuple):
+        self.theme = theme_tuple[0]
+        self.theme_num = theme_tuple[1]
+        self.updImage(&quot;down&quot;)
+
+    def reset(self):
+        self.score = 0
+        self.level_actions_complete = 0
+        self.direction = &#x27;down&#x27;
+        self.player_step_position = 1
+        self.player_step_count = 0
+
+# Simple count down timer, based on system clock
+
+class Timer():
+
+    # Debug allows print statements to monitor changes
+    # Use for debugging higher level code
+    # Only enable for the particular timer that you need to debug
+
+    def __init__(self, set_time, debug=False):
+        self.default_time = set_time        # default_time is what we revert to when reset
+        self.set_time = set_time
+        self.start_time = time.time()
+        self.debug = debug
+        self.printDebug(&quot;Init&quot;)
+
+    # start count down, with optional parameter to replace the start_time value
+    # -1 is used as a &quot;magic number&quot;, this method should only be called with positive number
+    # if it isn&#x27;t given a number then -1 indicates no new time give
+    def startCountDown(self, new_time = -1):
+        if (new_time &gt;= 0):
+            self.set_time = new_time
+        self.start_time = time.time()
+        self.printDebug(&quot;Timer started&quot;)
+
+    # Set count down to expired by setting start time in the past
+    def expireCountDown(self):
+        self.start_time = time.time() - self.set_time
+
+
+    # Returns time remaining note full accuracy - if need only seconds use math.floor
+    def getTimeRemaining(self):
+        # Set time - diff start and current time (as current time is bigger)
+        current_time = self.set_time + self.start_time - time.time()
+        self.printDebug(&quot;Time remaining: &quot;+str(current_time))
+        if (current_time &lt;= 0):
+            return 0
+        return current_time
+
+    def resetToDefault(self):
+        self.startCountDown(self.default_time)
+        self.printDebug()
+
+    # Return the default (ie normal start time)
+    def getDefaultTime(self):
+        self.printDebug()
+        return self.default_time
+
+
+    # Return the current start time
+    def getSetTime(self):
+        self.printDebug()
+        return self.set_time
+
+
+    def enableDebug(self):
+        self.debug = True
+
+    def disableDebug(self):
+        self.debug = False
+
+    def printDebug(self, extra=&quot;&quot;):
+        if (not self.debug):
+            return
+        print (&quot;Timer set = &quot;+str(self.set_time)+&quot; Timer time = &quot;+str(self.start_time)+&quot; &quot;+extra)
+
+# Status is tracked as a number, but to make the code readable constants are used
+# Note the actual number isn&#x27;t important, but the order is as may use &gt; or &lt;
+# Those with # * in the comments are used to determine higher state
+STATUS_PRE_GAME = 0             # * Used to delimit before game starts
+STATUS_TITLE = 1                # Title screen
+STATUS_MENU_START = 10          # * Used to delimit the menu
+STATUS_MENU_END = 19            # * End of Menu
+STATUS_SUBCOMMAND = 21
+STATUS_NEW = 30                 # * Game is ready to start, but not running
+STATUS_PLAYER1_START = 31
+STATUS_END = 50                 # * End of game reached
+STATUS_SHOW_SCORE = 51          # End message is displayed ready to restart
+
+# Number of actions to complete before moving up to the next level
+# Default = 30 (change for debugging)
+NEXT_LEVEL_ACTIONS = 30
+#NEXT_LEVEL_ACTIONS = 5
+
+# Number of seconds to display high score before allowing click to continue
+TIME_DISPLAY_SCORE = 3
+
+# Number of seconds when the timer starts
+TIMER_START = 10.9
+PAUSE_TIME = 1.5
+
+class GamePlay:
+
+    # These are what we need to track
+    score = 0
+    level = 0
+
+    # This is the timer we use for counting down time
+    game_timer = Timer(TIMER_START)
+    # Timer for game pauses
+    timer_pause = Timer(PAUSE_TIME)
+    # user pause is pause waiting on user (eg. to click)
+    # Can be True (paused) or False (unpaused)
+    user_pause = False
+
+    # Set a default target (but this will be updated when random direction generated)
+    target = &#x27;south&#x27;
+
+    # Message to display when paused / level up etc.
+    game_message = &quot;&quot;
+    # Track number of actions caught within this level - used to determine decay and next level
+    level_actions_complete = 0
+
+    status = STATUS_TITLE
+
+    # Must be initialized with a  game_timer timer (of Timer class) and dictionary with action_text instructions
+    def __init__(self, action_text):
+        self.action_text = action_text
+        # Set initial target move
+        self.getNextMove()
+
+    def setShowScore(self):
+        self.status = STATUS_SHOW_SCORE
+        self.timer_pause.startCountDown()
+
+    def isShowScore(self):
+        if (self.status == STATUS_SHOW_SCORE):
+            return True
+        return False
+
+    # Only returns true if STATUS_SHOW_SCORE and timer expired
+    def isScoreShown(self):
+        if (self.status == STATUS_SHOW_SCORE and self.timer_pause.getTimeRemaining() &lt;= 0):
+            return True
+        return False
+
+    # If game has not yet started
+    def isNewGame(self):
+        if self.status == STATUS_NEW:
+            return True
+        return False
+
+    def isTitleScreen(self):
+        if self.status == STATUS_TITLE:
+            return True
+        return False
+
+    def isGameOver(self):
+        if self.status == STATUS_END:
+            return True
+        return False
+
+    def setGameOver(self):
+        # Add short timer for game over to ensure
+        # player gets to see high score
+        self.game_timer.startCountDown(TIME_DISPLAY_SCORE)
+        self.status = STATUS_END
+
+    def isGameRunning(self):
+        if (self.status &gt;= STATUS_PLAYER1_START and self.status &lt; STATUS_END):
+            return True
+        return False
+
+
+    def startNewGame(self):
+        self.reset()
+        self.status = STATUS_NEW
+        self.getNextMove()
+        # Resets and start the timer
+        self.game_timer.resetToDefault()
+        self.status = STATUS_PLAYER1_START
+
+
+    # Point scored, so add score and get next move
+    # Update level if required then return level number
+    def scorePoint(self):
+        self.score += 1
+        self.getNextMove()
+        self.level_actions_complete += 1
+        # Update timer - subtracting timer decrement for each point scored
+        timer_start = self.game_timer.getSetTime()       # current timer start
+        # Timer update to extend a little due to difficulty
+        new_timer_time = timer_start + 2.5 - (timer_start * (self.level_actions_complete / (self.level_actions_complete + 10)))
+        # Don&#x27;t want new timer to be larger than previous
+        if (new_timer_time &gt; timer_start):
+            new_timer_time = timer_start
+        self.game_timer.startCountDown(new_timer_time)
+
+        # Check to see if the user has scored enough to move up a level
+        if (self.level_actions_complete &gt;= NEXT_LEVEL_ACTIONS):
+            self.game_timer.resetToDefault()
+            self.level += 1
+            self.level_actions_complete = 0
+        return self.level
+
+    def getScore(self):
+        return self.score
+
+    # Returns level number - or 0 if not in play
+    def getLevel(self):
+        if (self.isGameRunning()):
+            return self.level
+        else:
+            return 0
+
+    # Return status, unless not running
+    def getStateString(self):
+        if (self.isGameRunning()):
+            return self.action_text[self.target]
+        else:
+            return (&quot;Not running&quot;)
+
+    def getGameMessage(self):
+        return self.game_message
+
+
+    # If game paused normally then decrement
+    # If game 0 then return False - no longer paused
+    # Otherwise return True
+    def isTimerPause(self):
+        if (self.timer_pause.getTimeRemaining() &gt; 0):
+            return True
+        return False
+
+    # Specifically looks if the user has paused (ie game_pause = -1)
+    def isUserPause(self):
+        return self.user_pause
+
+    # Set pause to number of updates (approx 60 per second)
+    # Or set to 0 for no pause
+    # Don&#x27;t use for user pause (as may change in future)
+    def setTimerPause(self, time):
+        self.timer_pause.startCountDown(time)
+
+    def startTimerPause(self):
+        self.timer_pause.startCountDown()
+
+    # Pause waiting on user - True = pause, False = not pause
+    def setUserPause(self, status=True):
+        self.game_pause = status
+
+    def getCurrentMove(self):
+        return self.target
+
+    # Update to next move and return
+    #Get next direction / jump / duck
+    def getNextMove(self):
+        move_choices = [&#x27;north&#x27;, &#x27;south&#x27;, &#x27;east&#x27;, &#x27;west&#x27;, &#x27;jump&#x27;, &#x27;duck&#x27;]
+        self.target = random.choice(move_choices)
+        return self.target
+
+    def setGameMessage(self, message):
+        self.game_message = message
+
+    def getGameMessage(self):
+        return self.game_message
+
+    def getTimeRemaining(self):
+        return self.game_timer.getTimeRemaining()
+
+
+    def setMenu(self, first_run = False):
+        self.status = STATUS_MENU_START
+        # If first run then don&#x27;t use timer so can move cursor straight away
+        if (first_run):
+            self.timer_pause.expireCountDown()
+        else:
+            self.timer_pause.startCountDown()
+
+    def isMenu(self):
+        if (self.status &gt;= STATUS_MENU_START and self.status &lt;= STATUS_MENU_END):
+            return True
+        return False
+
+
+    def setSubCommand(self, sub_command):
+        self.sub_command = sub_command
+        self.status = STATUS_SUBCOMMAND
+
+    def isSubCommand(self):
+        if self.status == STATUS_SUBCOMMAND:
+            return True
+        return False
+
+    def getSubCommand(self):
+        if self.status == STATUS_SUBCOMMAND:
+            return self.sub_command
+        return None
+
+
+    # Gets the current status as a number - use for debugging only
+    def getStatusNum(self):
+        return self.status
+
+
+    # Reset game to level
+    def reset(self):
+        self.level_actions_complete = 0
+        self.score = 0
+        self.level = 1
+
+# Holds and stores the selected controls
+# Works by having a method for each of the controls which tests if any selected
+# Allows multiple key options for each key (eg. space and enter for jump / duck)
+
+# Default keys provide a way to restore keys if they are corrupt
+# either by deleting the config file, or from the command line
+default_keys = {
+    &#x27;escape&#x27; : [keys.ESCAPE],
+    &#x27;jump&#x27;: [keys.RETURN, keys.RSHIFT, keys.LCTRL],
+    &#x27;duck&#x27;: [keys.SPACE, keys.LSHIFT],
+    &#x27;up&#x27;: [keys.UP, keys.W],
+    &#x27;down&#x27;: [keys.DOWN, keys.S],
+    &#x27;left&#x27;: [keys.LEFT, keys.A],
+    &#x27;right&#x27;: [keys.RIGHT, keys.D],
+    &#x27;pause&#x27;: [keys.P]
+}
+
+#configured_keys
+
+
+class GameControls:
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.configured_keys = default_keys.copy()
+        self.loadControls()
+
+    # Controls (if it exists) is a pickle file
+    def loadControls(self):
+        try:
+            with open(self.filename, &#x27;rb&#x27;) as infile:
+                self.configured_keys = pickle.load(infile)
+        except:
+            self.configured_keys = default_keys.copy()
+
+
+    # Replaces current file with configured_keys
+    def saveControls(self):
+        try:
+            with open(self.filename, &quot;wb&quot;) as outfile:
+                pickle.dump (self.configured_keys, outfile, pickle.HIGHEST_PROTOCOL)
+        except Exception (e):
+            print (&quot;Save custom controls failed&quot;)
+            print (str(e))
+
+
+
+    # Returns True if the key is pressed, else false
+    def isPressed(self, keyboard, key):
+        for this_key in self.configured_keys[key]:
+            if keyboard[this_key]:
+                return True
+        return False
+
+    # Same as isPressed, but can test for multiple keys
+    # keys must be array
+    def isOrPressed(self, keyboard, keys):
+        for i in range (0,len(keys)):
+            for this_key in self.configured_keys[keys[i]]:
+                if keyboard[this_key]:
+                    return True
+        return False
+
+
+
+    def getKeys(self):
+        return self.configured_keys
+
+
+
+    def getKeyString(self,index):
+        return_string = &quot;&quot;
+        for this_entry in self.configured_keys[index]:
+            return_string += str(this_entry)+&quot; &quot;
+        return return_string
+
+    def setKey(self, key, keycode):
+        self.configured_keys[key] = [keycode]
+
+class HighScore():
+
+    background_img = &quot;background_settings_01&quot;
+
+    # If set to true then print error message to console if unable to write to high score file
+    debug = True
+
+    # Values is score as int and names is name of user (3 initials)
+    # Must be ordered high to low
+    high_score_values = []
+    high_score_names = []
+
+    max_entries = 10
+
+    # Mode is normally display except when adding new score
+    # in which case it is set to edit, then save when updating
+    mode = &#x27;display&#x27;
+
+
+
+    def __init__(self, game_controls, filename):
+        self.game_controls = game_controls
+        self.filename = filename
+        # Setup high score when created
+        self.loadHighScore()
+        # Timer restrict keyboard movements to fraction of second (prevent multiple presses)
+        self.pause_timer = Timer(0.2)
+
+    # indicate we change to this display mode
+    # starts timer to prevent next click exit
+    def select(self):
+        self.pause_timer.startCountDown()
+
+    # Reads high scores from file and stores as lists
+    def loadHighScore(self):
+        # Open file if it already exists
+        try:
+            file = open(self.filename, &#x27;r&#x27;)
+            entries = file.readlines()
+            file.close()
+            for line in entries:
+                (this_name, this_score_str) = line.split(&#x27;,&#x27; , 1)
+                this_score_num = int(this_score_str)
+                self.high_score_values.append(this_score_num)
+                self.high_score_names.append(this_name)
+            file_exists = True
+        except Exception as e:
+            # Unable to read to file - warn to console
+            if (self.debug == True):
+                print (&quot;Unable to read file &quot;+self.filename+&quot; high scores will be reset\n&quot;+str(e))
+            # If either doesn&#x27;t exist or is corrupt add single dummy entry
+            self.high_score_values.append(0)
+            self.high_score_names.append(&quot;---&quot;)
+
+    # Checks if high score is achieved
+    def checkHighScore(self, new_score):
+        # first make sure we have a score, otherwise don&#x27;t enter
+        if (new_score &lt; 1):
+            return False
+        # Check if we have space - if so then always a high score
+        if (len(self.high_score_values) &lt; self.max_entries):
+            return True
+        # Check if high score is higher than last entry
+        if (new_score &gt; self.high_score_values[self.max_entries-1]):
+            return True
+        return False
+
+    # Initiates enter name mode
+    def setHighScore(self, new_score):
+        self.mode = &#x27;edit&#x27;
+        self.new_score = new_score
+        # Name is initials - list of 3 characters
+        self.new_name = [&#x27;-&#x27;,&#x27;-&#x27;,&#x27;-&#x27;]
+        self.char_selected = 0
+
+    def saveHighScore(self):
+        try:
+            with open(self.filename, &#x27;w&#x27;) as file:
+                for i in range (0,len(self.high_score_values)):
+                    file.write(self.high_score_names[i]+&quot;,&quot;+str(self.high_score_values[i])+&quot;\n&quot;)
+        except Exception as e:
+            # Unable to write to file - warn to console
+            if (self.debug == True):
+                print (&quot;Unable to write to file &quot;+self.filename+&quot; high scores will not be saved\n&quot;+str(e))
+
+
+    def draw(self, screen):
+        screen.blit(self.background_img, (0,0))
+        screen.draw.text(&#x27;High Scores&#x27;, fontsize=60, center=(400,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        y_pos = 120
+        if (self.mode == &#x27;edit&#x27;):
+            screen.draw.text(&#x27;New High Score &#x27;+str(self.new_score), fontsize=40, center=(400,120), color=(255,0,0))
+
+            # Set colour for characters (so selected one is different colour)
+            # Done using array
+
+            char_colours = [(255,0,0),(255,0,0),(255,0,0)]
+            char_colours[self.char_selected] = (0,0,0)
+
+
+            # Three characters for new name
+            screen.draw.text(self.new_name[0], fontsize=40, center=(380,180), color=char_colours[0])
+            # Three characters for new name
+            screen.draw.text(self.new_name[1], fontsize=40, center=(400,180), color=char_colours[1])
+            # Three characters for new name
+            screen.draw.text(self.new_name[2], fontsize=40, center=(420,180), color=char_colours[2])
+
+            y_pos = 240
+        self.showScores(screen, (200,y_pos))
+
+    # Draws scores directly onto screen. pos is the top left of the scores
+    def showScores(self,screen, pos):
+        screen.draw.text(&#x27;Rank&#x27;, fontsize=30, topleft=(pos[0],pos[1]), color=(0,0,0))
+        screen.draw.text(&#x27;Name&#x27;, fontsize=30, topleft=(pos[0]+150,pos[1]), color=(0,0,0))
+        screen.draw.text(&#x27;Score&#x27;, fontsize=30, topleft=(pos[0]+300,pos[1]), color=(0,0,0))
+        for i in range (0,len(self.high_score_values)):
+            screen.draw.text(str(i+1), fontsize=30, topleft=(pos[0],pos[1]+25+(20*i)), color=(0,0,0))
+            screen.draw.text(self.high_score_names[i], fontsize=30, topleft=(pos[0]+150,pos[1]+25+(20*i)), color=(0,0,0))
+            screen.draw.text(str(self.high_score_values[i]), fontsize=30, topright=(pos[0]+350,pos[1]+25+(20*i)), color=(0,0,0))
+
+
+    def update(self, keyboard):
+        if (self.pause_timer.getTimeRemaining() &gt; 0):
+            return &#x27;highscore&#x27;
+        # If mouse clicked then exit to menu
+        if (self.mode == &#x27;clicked&#x27;):
+            self.mode = &#x27;display&#x27;
+            return &#x27;menu&#x27;
+        if (self.mode == &#x27;edit&#x27;):
+            # Editing
+            if (self.game_controls.isPressed(keyboard,&#x27;up&#x27;)):
+                self.new_name[self.char_selected] = self.charIncrement(self.new_name[self.char_selected])
+                self.pause_timer.startCountDown()
+            if (self.game_controls.isPressed(keyboard,&#x27;down&#x27;)):
+                self.new_name[self.char_selected] = self.charDecrement(self.new_name[self.char_selected])
+                self.pause_timer.startCountDown()
+            if (self.game_controls.isPressed(keyboard,&#x27;left&#x27;)) :
+                if (self.char_selected &gt; 0) :
+                    self.char_selected -= 1
+                    self.pause_timer.startCountDown()
+            if (self.game_controls.isPressed(keyboard,&#x27;right&#x27;)) :
+                if (self.char_selected &lt; 2) :
+                    self.char_selected += 1
+                    self.pause_timer.startCountDown()
+            # If save chosen (map / jump / enter)
+            if (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;,&#x27;duck&#x27;])):
+                self.updHighScoreList()
+                self.saveHighScore()
+                self.mode = &#x27;display&#x27;
+                return &#x27;menu&#x27;
+            else:
+                return &#x27;highscore&#x27;
+        if (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;,&#x27;duck&#x27;])):
+            return &#x27;menu&#x27;
+        return &#x27;highscore&#x27;
+
+    def mouse_move (self,pos):
+        pass
+
+    def mouse_click (self,pos):
+        # mouse click returns to main menu
+        self.mode = &#x27;clicked&#x27;
+
+
+    def updHighScoreList(self):
+        added = False
+        # Go down the list until we find an entry that is smaller and insert there
+        for i in range (0,len(self.high_score_values)):
+            if (self.high_score_values[i] &lt; self.new_score):
+                self.high_score_values.insert(i,self.new_score)
+                self.high_score_names.insert(i,self.new_name[0]+self.new_name[1]+self.new_name[2])
+                added = True
+                break
+        # If added is still false then need to add it to the bottom
+        if (added == False):
+            self.high_score_values.append(self.new_score)
+            self.high_score_names.append(self.new_name[0]+self.new_name[1]+self.new_name[2])
+        # If have more than max then drop the last entry
+        if (len(self.high_score_values) &gt; self.max_entries):
+            self.high_score_values.pop()
+            self.high_score_names.pop()
+        # If last entry is score 0 then drop that as well (dummy entry)
+        if (self.high_score_values[-1] == 0):
+            self.high_score_values.pop()
+            self.high_score_names.pop()
+
+
+    #### To keep characters scrolling simple for user we only allow capital letters, numbers and -
+    def charIncrement (self, current_char):
+        if (current_char == &#x27;-&#x27;) :
+            return (&#x27;A&#x27;)
+        if (current_char == &#x27;Z&#x27;) :
+            return (&#x27;0&#x27;)
+        if (current_char == &#x27;9&#x27;) :
+            return (&#x27;-&#x27;)
+        return chr(ord(current_char) + 1)
+
+    def charDecrement (self, current_char):
+        if (current_char == &#x27;-&#x27;) :
+            return (&#x27;9&#x27;)
+        if (current_char == &#x27;A&#x27;) :
+            return (&#x27;-&#x27;)
+        if (current_char == &#x27;0&#x27;) :
+            return (&#x27;Z&#x27;)
+        return chr(ord(current_char) - 1)
+
+# Used by GameMenu
+
+class MenuItem:
+
+    page = &#x27;&#x27;
+
+    # Text is the text label to show to the user
+    # command is instruction to run or label of submenu (eg. &#x27;instructions&#x27;)
+    # menu_type is what kind of entry it is eg. &#x27;submenu&#x27;, &#x27;command&#x27;(return string), &#x27;textpage&#x27; or &#x27;subcommand&#x27; (command run within the menu)
+    def __init__ (self, text, command, menu_type):
+        self.text = text
+        self.command = command
+        self.menu_type = menu_type
+
+
+    def getText(self):
+        return self.text
+
+    def getCommand(self):
+        return self.command
+
+    def getMenuType(self):
+        return self.menu_type
+
+    def setPage(self, text):
+        self.page = text
+
+    # Only available for textpage
+    def getPage(self):
+        if self.menu_type != &#x27;textpage&#x27;:
+            return &quot;&quot;
+        else:
+            return self.page
+
+# Status values
+STATUS_MENU = 0
+STATUS_CLICKED = 1
+STATUS_PAGE = 2
+
+class GameMenu:
+
+    # Menu item details, perhaps consider putting this in a configuration
+    # file in future
+
+    menu_items = [
+        MenuItem(&#x27;Start game&#x27;, &#x27;start&#x27;, &#x27;command&#x27;),
+        MenuItem(&#x27;Instructions&#x27;, &#x27;instructions&#x27;, &#x27;textpage&#x27;),
+        MenuItem(&#x27;Customize character&#x27;, &#x27;character&#x27;, &#x27;subcommand&#x27;),
+        MenuItem(&#x27;Game controls&#x27;, &#x27;controls&#x27;, &#x27;subcommand&#x27;),
+        MenuItem(&#x27;View high scores&#x27;, &#x27;highscore&#x27;, &#x27;subcommand&#x27;),
+        MenuItem(&#x27;Credits&#x27;, &#x27;credits&#x27;, &#x27;textpage&#x27;),
+        MenuItem(&#x27;Quit&#x27;, &#x27;quit&#x27;, &#x27;command&#x27;)
+    ]
+
+    # Dictionary of text pages for menu entries
+    # Note currently no word wrapping - needs \n to be added in advance
+    menu_pages = {
+        &#x27;instructions&#x27;:&quot;INSTRUCTIONS\n\nFollow the direction at the top centre\nof the screen.\n\nMove the character using a joystick (Picade)\n or cursor keys (keyboard).\nPress top button or SPACE to duck\nPress RIGHT SHIFT to view the map\n\nAvoid the obstacles that appear on later levels\n&quot;,
+        &#x27;credits&#x27;:&quot;CREDITS\n\nCreate by Stewart Watkiss\nMade available under GPL v3 License\nSee: www.penguintutor.com/compassgame&quot;
+    }
+
+
+    menu_spacing = 50 # distance between menu items
+    top_spacing = 20  # distance between top of menu and start of menu
+    left_spacing = 20 # distance between left and text for page text / command text
+    menu_font_size = 45   # size of font for menu items
+    menu_font_page = 32   # size of font for text page display
+    status = STATUS_MENU         # Track whether to display menu or in menu etc.
+
+
+    # Requires width and height - these can be the same as the screen or smaller if need to constrain menu
+    # Offset and border determine distance from origin of screen and any fixed area to avoid respectively
+    def __init__(self, game_controls, width, height, offset=(0,0), border=100):
+        self.game_controls = game_controls
+        self.width = width              # width of screen
+        self.height = height            # height of screen
+        self.offset = offset            # tuple x,y for offset from start of screen
+        self.border = border            # single value same for x and y
+        # Start position of the menu area and size
+        self.start_pos = (self.offset[0]+self.border, self.offset[1]+self.border)
+        self.size = (self.width-2*self.start_pos[0], self.height-2*self.start_pos[1])
+
+        # Create a menu surface - this involves using pygame surface feature (rather than through pygame zero)
+        # Allows for more advanced features such as alpha adjustment (partial transparency)
+        self.menu_surface = Surface(self.size)
+        # 75% opacity
+        self.menu_surface.set_alpha(192)
+
+        # Position of rect is 0,0 relative to the surface, not the screen
+        self.menu_box = Rect((0,0),self.size)
+        # Uses pygame rect so we can add it to own surface
+        self.menu_rect = pygame.draw.rect(self.menu_surface , (200,200,200), self.menu_box)
+        self.menu_pos = 0       # Tracks which menu item is selected
+
+
+        # Timer restrict keyboard movements to prevent multiple presses
+        self.menu_timer = Timer(0.12)
+
+        # Finish setting up MenuItems
+        # At the moment this doesn&#x27;t provide much extra functionality, but by
+        # placing it into the MenuItem object then makes it easier if we load
+        # MenuItems from a configuration file in future
+        for i in range (0,len(self.menu_items)):
+            if self.menu_items[i].getCommand() in self.menu_pages:
+                self.menu_items[i].setPage(self.menu_pages[self.menu_items[i].getCommand()])
+
+
+    # Update menu based on keyboard direction
+    # If return is &#x27;menu&#x27; then still in menu, so don&#x27;t update anything else
+    # If return is &#x27;quit&#x27; then quit the application
+    # Any other return is next instruction
+    def update(self, keyboard):
+        # set status_selected if menu status changed (through mouse click or press)
+        selected_command_type = &quot;&quot;
+        selected_command = &quot;&quot;
+        # check if status is clicked - which means mouse was pressed on a valid entry
+        if (self.status == STATUS_CLICKED):
+            selected_command_type = self.menu_items[self.menu_pos].getMenuType()
+            selected_command = self.menu_items[self.menu_pos].getCommand()
+            self.status = STATUS_MENU
+        # check if we are in menu timer in which case return until expired
+        elif (self.menu_timer.getTimeRemaining() &gt; 0):
+            return &#x27;menu&#x27;
+        elif (self.game_controls.isPressed(keyboard,&#x27;up&#x27;) and self.menu_pos&gt;0):
+            if (self.status == STATUS_MENU):
+                self.menu_pos -= 1
+                self.menu_timer.startCountDown()
+        elif (self.game_controls.isPressed(keyboard,&#x27;down&#x27;) and self.menu_pos&lt;len(self.menu_items)-1):
+            if (self.status == STATUS_MENU):
+                self.menu_pos += 1
+                self.menu_timer.startCountDown()
+        elif (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;,&#x27;duck&#x27;])):
+            if (self.status == STATUS_MENU):
+                selected_command_type =  self.menu_items[self.menu_pos].getMenuType()
+                selected_command = self.menu_items[self.menu_pos].getCommand()
+            # If click was on text page then return to main menu
+            elif (self.status == STATUS_PAGE):
+                selected_command_type = &#x27;menu&#x27;
+                self.status = STATUS_MENU
+                self.menu_timer.startCountDown()
+        elif (self.game_controls.isPressed(keyboard,&#x27;escape&#x27;)):
+            selected_command_type = &#x27;command&#x27;
+            selected_command = &#x27;quit&#x27;
+
+        # If a menu object was clicked / chosen then handle
+        if (selected_command_type == &#x27;command&#x27;):
+            # Reset menu to start position
+            self.reset()
+            return selected_command
+        elif (selected_command_type == &#x27;textpage&#x27;):
+            self.status = STATUS_PAGE
+            self.menu_timer.startCountDown()
+            return &#x27;menu&#x27;
+        elif (selected_command_type == &#x27;subcommand&#x27;):
+            return selected_command
+        else:
+            return &#x27;menu&#x27;
+
+
+    def show(self, screen):
+        # Create a rectangle across the area - provides transparancy
+        screen.blit(self.menu_surface,self.start_pos)
+        # draw directly onto the screen draw surface (transparency doesn&#x27;t apply)
+        if (self.status == STATUS_MENU):
+            self.showMenu(screen)
+        elif (self.status == STATUS_PAGE):
+            self.showPage(screen)
+
+
+
+    def showMenu(self, screen):
+        for menu_num in range (0,len(self.menu_items)):
+            if (menu_num == self.menu_pos):
+                background_color = (255,255,255)
+            else:
+                background_color = None
+            screen.draw.text(self.menu_items[menu_num].getText(), fontsize=self.menu_font_size, midtop=(self.width/2,self.offset[1]+self.border+(self.menu_spacing*menu_num)+self.top_spacing), color=(0,0,0), background=background_color)
+
+
+    # Shows a page of text
+    def showPage(self, screen):
+        page_text = self.menu_items[self.menu_pos].getPage()
+        screen.draw.text(page_text, fontsize=self.menu_font_page, topleft=(self.offset[0]+self.border+self.left_spacing,self.offset[1]+self.border+self.top_spacing), color=(0,0,0))
+
+
+
+    def mouse_move(self, pos):
+        if (self.status == STATUS_MENU):
+            return_val = self.get_mouse_menu_pos(pos)
+            if return_val != -1:
+                self.menu_pos = return_val
+
+
+    def mouse_click(self, pos):
+        if (self.status == STATUS_MENU):
+            return_val = self.get_mouse_menu_pos(pos)
+            if return_val != -1:
+                self.menu_pos = return_val
+                self.status = STATUS_CLICKED
+        # If click from text page then return to menu
+        elif (self.status == STATUS_PAGE):
+            self.status = STATUS_MENU
+
+    def reset(self):
+        self.menu_pos = 0
+        self.status = STATUS_MENU
+
+
+    # Checks if mouse is over menu and if so returns menu position
+    # Otherwise returns -1
+    def get_mouse_menu_pos (self, pos):
+        if (pos[0] &gt; self.start_pos[0] and pos[1] &gt; self.start_pos[1] + self.top_spacing and pos[0] &lt; self.start_pos[0] + self.size[0] and pos[1] &lt; self.start_pos[1] + self.size[1]):
+            start_y = self.start_pos[1] + self.top_spacing
+            for this_menu_pos in range(0,len(self.menu_items)):
+                if (pos[1] - start_y &gt;= this_menu_pos * self.menu_spacing and pos[1] - start_y &lt;= (this_menu_pos * self.menu_spacing)+self.menu_spacing):
+                    return this_menu_pos
+        # If not returned then not over menu
+        return -1
+
+CFG_FILE_FORMAT = &quot;person_{}_theme.cfg&quot;
+
+
+# Loads and provides information on the theme
+class ThemeDetails:
+
+    # Keys is a list so it is indexed
+    keys=[]
+    about={}
+    default_colours={}
+    labels={}
+
+    # colour options is an dictionary with array of tuples
+    colour_options={}
+
+    # don&#x27;t change default colours - they belong to the theme
+    # instead update current_colours
+
+
+    def __init__(self, theme_dir):
+        self.theme_dir = theme_dir
+        self.theme_loaded = False
+
+
+    # Loads colour config file for person
+    def loadConfig (self, theme):
+        self.theme = theme
+
+        # Reset all these entries to prevent loading alongside existing
+        self.keys=[]
+        self.about={}
+        self.default_colours={}
+        self.labels={}
+        self.colour_options={}
+
+        try :
+            filename = self.theme_dir+CFG_FILE_FORMAT.format(theme)
+
+            with open(filename, &#x27;r&#x27;) as yaml_file:
+                # theme_config is a dictionary
+                theme_config = yaml.load(yaml_file)
+
+            for key in theme_config[&#x27;about&#x27;]:
+                self.about[key]=theme_config[&#x27;about&#x27;][key]
+
+            for key in theme_config[&#x27;labels&#x27;]:
+                self.keys.append(key)
+                self.labels[key]=theme_config[&#x27;labels&#x27;][key]
+            for key in theme_config[&#x27;default_colours&#x27;]:
+                this_colour = tuple(map(int, theme_config[&#x27;default_colours&#x27;][key].split(&#x27;,&#x27;)))
+                self.default_colours[key]=this_colour
+
+            # These are array within a dictionary
+            for key in theme_config[&#x27;colour_options&#x27;]:
+                temp_array = theme_config[&#x27;colour_options&#x27;]
+                self.colour_options[key]=[]
+                for this_colour_str in theme_config[&#x27;colour_options&#x27;][key]:
+                    this_colour = tuple(map(int, this_colour_str.split(&#x27;,&#x27;)))
+                    self.colour_options[key].append(this_colour)
+
+            self.custom_colours = self.default_colours.copy()
+
+            # Simple check - if we haven&#x27;t raised an exception then theme loaded
+            # Doesn&#x27;t check number of entries
+            self.theme_loaded = True
+        except Exception as e:
+            print (&quot;Error loading theme &quot;+theme)
+            print (str(e))
+            self.theme_loaded = False
+
+    # Return all the CustomColours
+    def getCustomColours(self):
+        return self.custom_colours
+
+
+    def isThemeLoaded(self):
+        return self.theme_loaded
+
+
+    def getTheme(self):
+        return self.theme
+
+    # Returns dict of short label = full string
+    def getLabels(self):
+        return self.labels
+
+    def getDefaultColour(self,key):
+        return self.default_colours[key]
+
+    # uses custom colours
+    def getColour(self,key):
+        return self.custom_colours[key]
+
+    def setColour(self,key, colour):
+        self.custom_colours[key] = colour
+
+    def getKeys(self):
+        return self.keys
+
+    def numKeys(self):
+        return len(self.keys)
+
+    # This should be the same for any, but no guarentee in future so allows key
+    def numColourOptions(self, key=&#x27;default&#x27;):
+        return len(self.colour_options[key])
+
+    def getLabel(self, key):
+        return self.labels[key]
+
+    def getColourOptions(self, key):
+        if (key in self.colour_options):
+            return self.colour_options[key]
+        else:
+            return self.colour_options[&#x27;default&#x27;]
+
+# Directories relative to the application directory
+THEME_DIR = &quot;themes/&quot;
+IMAGE_DIR = &quot;images/&quot;             # This is fixed for pgzero files
+TEMP_DIR = &quot;tmp/&quot;                 # Use to create svgs before creating the png files
+
+# Track state for the display
+# &#x27;main&#x27; is the main page, &#x27;custom&#x27; is used to choose custom colours, &#x27;clicked&#x27; used to handle mouse click
+STATUS_MAIN = 0
+STATUS_CUSTOM = 1
+STATUS_CLICKED = 2
+STATUS_PROGRESS = 3
+
+CONVERT_CMD = &quot;/usr/bin/convert&quot;
+# {} is used to represent in and out files - uses .format
+CONVERT_CMD_OPTS = &quot; -resize 40x77 -background transparent {} {}&quot;
+
+class CustomCharacter:
+
+    background_img = &quot;background_settings_01&quot;
+
+    # Load default image for each actor to allow character selection
+    current_theme_actors = []
+    available_theme_actors = []
+
+    current_themes = []    # Stores tuple with theme and variation number - eg. (person1,2)
+    available_themes = []
+
+
+    current_actor_ypos = 220
+    custom_actor_ypos = 460
+
+    # Are we on top row (0 = current_characters) or bottom row (1 = customize characters)
+    selected_row = 0
+    # position of selection on the x axis
+    selected_col = 0
+
+    # Which row is selected when creating a custom entry
+    selected_row_custom = 0
+    # which colour col pos is selected (-1 = none)
+    selected_colour_custom = -1
+
+    # Default theme must be valid
+    theme = &quot;person1&quot;
+    theme_num = 0
+
+    # Class to hold details of theme from config file
+    theme_config = ThemeDetails(THEME_DIR)
+
+    # Track which character is shown on the left most position
+    char_left_pos = 0
+
+
+    status = STATUS_MAIN
+
+    def __init__ (self, game_controls, img_file_format):
+        self.game_controls = game_controls
+        self.img_file_format = img_file_format
+        # Create a regular expression to identify themes
+        # does not use \w as do not include _ character
+        # Look for image 0 (down 1) - other variants of the first number part is different colours
+        # Timer restrict keyboard movements to fraction of second to prevent multiple presses
+        self.pause_timer = Timer(0.12)
+        self.loadPreviews()
+        self.loadThemes()
+
+
+
+    # Themes only need to be loaded once - they don&#x27;t change except by downloading and installing
+    def loadThemes(self):
+        # Load the themes - only look in the SVG folder
+        theme_regexp_string = self.img_file_format.format(&quot;([a-zA-Z0-9]+)&quot;, &quot;00&quot;, &quot;down&quot;, &quot;01&quot;)+&quot;.svg&quot;
+        theme_regexp = re.compile(theme_regexp_string)
+        xpos = 100
+        for file in listdir(THEME_DIR):
+            matches = theme_regexp.match(file)
+            if (matches != None):
+                # uses group(0) for full filename, group(1) for theme name
+                self.available_themes.append(matches.group(1))
+                # Add default image (theme 00 down 01) as actor
+                self.available_theme_actors.append(Actor(self.img_file_format.format(matches.group(1), &quot;00&quot;, &quot;down&quot;, &quot;01&quot;), (xpos,self.custom_actor_ypos)))
+                xpos += 100
+
+    # Previews are the current variations of the themes, these may be reloaded when a new custom character is created
+    def loadPreviews(self):
+        # Reset values from previous load
+        self.current_themes = []
+        self.current_theme_actors = []
+
+        # Load the different variations on the themes currently available
+        png_regexp_string = self.img_file_format.format(&quot;([a-zA-Z0-9]+)&quot;, &quot;([0-9][0-9])&quot;, &quot;down&quot;, &quot;01&quot;)+&quot;.png&quot;
+        png_regexp = re.compile(png_regexp_string)
+        xpos = 100
+        for file in listdir(IMAGE_DIR):
+            matches = png_regexp.match(file)
+            if (matches != None):
+                # uses group(0) for full filename, group(1) for theme name
+                self.current_themes.append((matches.group(1),int(matches.group(2))))
+                self.current_theme_actors.append(Actor(self.img_file_format.format(matches.group(1), matches.group(2), &quot;down&quot;, &quot;01&quot;), (xpos,self.current_actor_ypos)))
+                xpos += 100
+
+
+
+    def draw(self, screen):
+        if (self.status == STATUS_MAIN):
+            self.drawMain(screen)
+        elif (self.status == STATUS_CUSTOM):
+            self.drawCustom(screen)
+
+    def drawCustom(self, screen):
+        screen.blit(self.background_img, (0,0))
+        screen.draw.text(&#x27;Customize Character&#x27;, fontsize=60, center=(400,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        if (not self.theme_config.isThemeLoaded):
+            screen.draw.text(&#x27;No config found for this theme, please choose a different theme&#x27;, fontsize=40, topleft=(100,150), color=(255,0,0))
+            return
+        ypos = 100
+        list_keys = self.theme_config.getKeys()
+        for i in range(0,len(list_keys)):
+            key = list_keys[i]
+            screen.draw.text(self.theme_config.getLabel(key), fontsize=30, topleft=(100,ypos), color=(0,0,0))
+            if (i == self.selected_row_custom):
+                if (self.selected_colour_custom == -1):
+                    self.drawColourBox(screen, True, self.theme_config.getColour(key), 300, ypos)
+                else:
+                    self.drawColourBox(screen, False, self.theme_config.getColour(key), 300, ypos)
+                # If a row selected then show colour options
+                self.showColourOptions (screen, key, 350, ypos)
+            else:
+                self.drawColourBox(screen, False, self.theme_config.getColour(key), 300, ypos)
+            ypos += 50
+        # Add OK / Cancel buttons
+        if (self.selected_row_custom == self.theme_config.numKeys() and self.selected_colour_custom == -1):
+            screen.draw.text(&#x27;Save&#x27;, fontsize=30, center=(150,500), color=(0,0,0), background=(255,255,255))
+        else:
+            screen.draw.text(&#x27;Save&#x27;, fontsize=30, center=(150,500), color=(0,0,0))
+        if (self.selected_row_custom == self.theme_config.numKeys() and self.selected_colour_custom &gt; -1):
+            screen.draw.text(&#x27;Cancel&#x27;, fontsize=30, center=(300,500), color=(0,0,0), background=(255,255,255))
+        else:
+            screen.draw.text(&#x27;Cancel&#x27;, fontsize=30, center=(300,500), color=(0,0,0))
+        self.preview.draw()
+
+    # Draws box, if selected = True includes highlight
+    # x, y pos is the box without highlighting - with highligting it will be -2 from that value
+    def drawColourBox(self, screen, selected, colour, xpos, ypos):
+        if (selected):
+            # If cursor is on this position (-1) then highlight current colour
+            # Higlight with black and white so it will contrast with either colour
+            screen.draw.filled_rect(Rect((xpos,ypos),(24,24)), (0,0,0))
+            screen.draw.filled_rect(Rect((xpos-2,ypos-2),(24,24)), (255,255,255))
+        screen.draw.filled_rect(Rect((xpos,ypos),(20,20)), colour )
+
+
+    # Shows the available colours - part is what part of body / clothing
+    def showColourOptions(self, screen, part, xpos, ypos):
+        colour_options = self.theme_config.getColourOptions(part)
+        for i in range(0,len(colour_options)):
+            if (i == self.selected_colour_custom):
+                self.drawColourBox(screen, True, colour_options[i], xpos+(25*i), ypos)
+            else:
+                self.drawColourBox(screen, False, colour_options[i], xpos+(25*i), ypos)
+
+    def drawMain(self, screen):
+        screen.blit(self.background_img, (0,0))
+
+        # Draw a box around the current character
+        # Get a rect same pos as character
+        # Done first so that it can be filled to make lines thicker
+        if (self.selected_row == 0):
+            highlight_rect = self.current_theme_actors[self.selected_col].copy()
+        elif (self.selected_row == 1):
+            highlight_rect = self.available_theme_actors[self.selected_col].copy()
+        highlight_rect.inflate_ip(6,6)
+        screen.draw.filled_rect(highlight_rect, (255,255,255))
+
+        screen.draw.text(&#x27;Custom Character&#x27;, fontsize=60, center=(400,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+
+        screen.draw.text(&#x27;Existing Character&#x27;, fontsize=40, center=(400,120), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        self.drawCustomChars()
+
+        screen.draw.text(&#x27;Customize Character&#x27;, fontsize=40, center=(400,340), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        for i in range (0,len(self.available_theme_actors)):
+            self.available_theme_actors[i].draw()
+
+    # Draws the custom chars
+    # First updates each of the actors with their current location then calls
+    # draw
+    def drawCustomChars(self):
+        xpos = 100
+        for i in range (self.char_left_pos,self.char_left_pos+7):
+            if (i &gt;= len(self.current_theme_actors)):
+                break
+            self.current_theme_actors[i].x = xpos
+            self.current_theme_actors[i].draw()
+            xpos += 100
+
+    def update(self, keyboard):
+        if (self.pause_timer.getTimeRemaining() &gt; 0):
+            return
+        # Control main screen
+        if (self.status == STATUS_MAIN):
+            # returns whatever updateMain returns - None if still in selection or menu if theme updated
+            return self.updateMain(keyboard)
+        elif (self.status == STATUS_CUSTOM):
+            self.status = self.updateCustom(keyboard)
+            if (self.status == STATUS_MAIN):
+                self.pause_timer.startCountDown()
+            return
+        # If mouse clicked
+        elif (self.status == STATUS_CLICKED):
+            self.status = STATUS_MAIN
+            if (self.selected_row == 0):
+                (self.theme, self.theme_num) = self.current_themes[self.selected_col]
+            return &#x27;menu&#x27;
+        elif (self.status == STATUS_PROGRESS):
+            # Reload the custom screen
+            self.loadPreviews()
+            self.status = STATUS_MAIN
+        else:
+            return
+
+    # Update on customize screen
+    def updateCustom(self, keyboard):
+        self.pause_timer.startCountDown()
+        if (keyboard.down):
+            self.selected_row_custom +=1
+            # If already on bottom row (Cancel / OK Button) then stay there and return
+            if (self.selected_row_custom &gt; self.theme_config.numKeys()):
+                self.selected_row_custom = self.theme_config.numKeys()
+                return STATUS_CUSTOM
+            # Whenever moving up or down reset to the current colour position  (or OK button for bottom row)
+            self.selected_colour_custom = -1
+            # Row after colours is Cancel / OK button
+            if (self.selected_row_custom &gt;= self.theme_config.numKeys()):
+                    self.selected_row_custom = self.theme_config.numKeys()
+        if (self.game_controls.isPressed(keyboard,&#x27;up&#x27;)):
+            self.selected_row_custom -=1
+            # Whenever moving up or down reset to the current colour position
+            self.selected_colour_custom = -1
+            # Row after colours is Cancel / OK button
+            if (self.selected_row_custom &lt; 0):
+                    self.selected_row_custom = 0
+        if (self.game_controls.isPressed(keyboard,&#x27;left&#x27;)):
+            self.selected_colour_custom -= 1
+            if self.selected_colour_custom &lt; -1:
+                self.selected_colour_custom = -1
+        if (self.game_controls.isPressed(keyboard,&#x27;right&#x27;)):
+            # Reuse the colour for use by the Cancel button
+            if (self.selected_row_custom &gt; self.theme_config.numKeys()):
+                self.selected_colour_customer = 0
+                return STATUS_CUSTOM
+            self.selected_colour_custom += 1
+            if self.selected_colour_custom &gt; self.theme_config.numColourOptions() -1:
+                self.selected_colour_custom = self.theme_config.numColourOptions() -1
+        if (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;, &#x27;duck&#x27;])):
+            if (self.selected_row_custom &lt; self.theme_config.numKeys()):
+                all_keys = self.theme_config.getKeys()
+                this_key = all_keys[self.selected_row_custom]
+                colour_options = self.theme_config.getColourOptions(this_key)
+                # update with the selected colour
+                self.theme_config.setColour(this_key,colour_options[self.selected_colour_custom])
+                return STATUS_CUSTOM
+            # Here if it&#x27;s a select on bottom row = Save or Cancel
+            # Cancel button selected
+            elif (self.selected_colour_custom &gt; -1):
+                return STATUS_MAIN
+            else:
+                file_num = self.findNextNumber(self.customize_theme)
+                # Should only get this if over 100 entries for this theme
+                # so hopefully never - just returns back to the main customize screen, but prints to console (same as cancel)
+                if (file_num == 0):
+                    print (&quot;Unable to find next number for save file&quot;)
+                    return STATUS_MAIN
+
+                svg_regexp_string = self.img_file_format.format(self.customize_theme, &quot;00&quot;, &quot;([a-zA-Z0-9]+)&quot;, &quot;([0-9][0-9])&quot;)+&quot;.svg&quot;
+                svg_regexp = re.compile(svg_regexp_string)
+
+                # Store the different filenames in a list so that they can be used later
+                new_filenames = []
+                new_png_filenames = []
+
+                for file in listdir(THEME_DIR):
+                    matches = svg_regexp.match(file)
+                    if (matches != None):
+                        two_digit_str = &quot;{:02d}&quot;.format(file_num)
+                        new_filename = self.img_file_format.format(self.customize_theme, two_digit_str, matches.group(1), matches.group(2))+&quot;.svg&quot;
+                        new_filenames.append(new_filename)
+                        new_png_filename = self.img_file_format.format(self.customize_theme, &quot;{:02d}&quot;.format(file_num), matches.group(1), matches.group(2))+&quot;.png&quot;
+                        new_png_filenames.append(new_png_filename)
+                        # Create SVG
+                        if (self.createSVG(THEME_DIR+matches.group(0), TEMP_DIR+new_filename)):
+                            # convert from SVG to png using ImageMagick convert (must be installed) only if create SVG was successful
+                            subprocess.call(CONVERT_CMD+CONVERT_CMD_OPTS.format(TEMP_DIR+new_filename, IMAGE_DIR+new_png_filename), shell=True)
+                return STATUS_PROGRESS
+        else:
+            return STATUS_CUSTOM
+
+    # Update main screen
+    def updateMain(self, keyboard):
+        if (self.game_controls.isPressed(keyboard,&#x27;up&#x27;)):
+            self.selected_row = 0
+            self.selected_col = self.checkColPos(self.selected_col, self.selected_row)
+        if (self.game_controls.isPressed(keyboard,&#x27;down&#x27;)):
+            self.selected_row = 1
+            self.selected_col = self.checkColPos(self.selected_col, self.selected_row)
+        if (self.game_controls.isPressed(keyboard,&#x27;right&#x27;)):
+            self.selected_col = self.checkColPos(self.selected_col + 1, self.selected_row)
+        if (self.game_controls.isPressed(keyboard,&#x27;left&#x27;)):
+            self.selected_col = self.checkColPos(self.selected_col - 1, self.selected_row)
+        if (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;,&#x27;duck&#x27;])):
+            # If pressed on top row then update theme
+            if (self.selected_row == 0):
+                (self.theme, self.theme_num) = self.current_themes[self.selected_col]
+            # If pressed on second row then customize theme
+            elif (self.selected_row == 1):
+                # Reset position
+                self.selected_row_custom = 0
+                self.selected_colour_custom = -1
+
+                self.customize_theme = self.available_themes[self.selected_col]
+                self.status = STATUS_CUSTOM
+                self.preview = Actor (self.img_file_format.format(self.customize_theme, &quot;00&quot;, &quot;down&quot;, &quot;01&quot;), (700,150))
+                self.theme_config.loadConfig(self.customize_theme)
+                self.pause_timer.startCountDown()
+                return &#x27;character&#x27;
+            return &#x27;menu&#x27;
+        self.pause_timer.startCountDown()
+
+
+
+    # Checks to see if col is too far left or right and returns nearest safe pos
+    def checkColPos (self, col_pos, row_pos):
+        # Too far left is same either case return 0
+        if (col_pos &lt; 0):
+            return 0
+        # Top row
+        if (row_pos == 0):
+            if (col_pos &gt;= len(self.current_themes)):
+                return (len(self.current_themes) -1)
+            elif (col_pos &gt;= self.char_left_pos + 7 and self.char_left_pos &lt; len(self.current_themes) - 6):
+                self.char_left_pos += 1
+            elif (col_pos &lt;= self.char_left_pos and self.char_left_pos &gt; 0):
+                self.char_left_pos -= 1
+        elif (row_pos == 1):
+            if (col_pos &gt;= len(self.available_themes)):
+                return (len(self.available_themes) -1)
+        return col_pos
+
+    def mouse_move (self,pos):
+        pass
+
+    def mouse_click (self,pos):
+        if (self.pause_timer.getTimeRemaining() &gt; 0):
+            return
+        self.pause_timer.startCountDown()
+        if (self.status == STATUS_MAIN):
+            # cycle through different images checking for collision
+            for i in range (0,len(self.current_theme_actors)):
+                if (self.current_theme_actors[i].collidepoint(pos)):
+                    self.selected_row = 0
+                    self.selected_col = i
+                    self.status = STATUS_CLICKED
+                    return
+            for i in range (0,len(self.available_theme_actors)):
+                if (self.available_theme_actors[i].collidepoint(pos)):
+                    self.selected_row = 1
+                    self.selected_col = i
+                    self.status = STATUS_CLICKED
+                    return
+
+
+
+
+    def select(self):
+        self.pause_timer.startCountDown()
+
+
+    def getTheme(self):
+        return (self.theme, self.theme_num)
+
+
+    # Get next available number for this theme
+    # Iterates through permutations of files looking for next one that doesn&#x27;t exist
+    def findNextNumber(self,theme):
+        # create new format string with just number missing - needs .png extension
+        player_img_format_num = IMAGE_DIR+self.img_file_format.format(theme,&quot;{:02d}&quot;,&quot;down&quot;,&quot;01&quot;)+&quot;.png&quot;
+        # Check for this incrementing one each time
+        for i in range (1,100):
+            if (not os.path.isfile(player_img_format_num.format(i))):
+                return i
+        # Unlikely to ever reach this - 100 entries for a single theme
+        return 0
+
+
+    # Create SVG based on original, creating new file
+    # Uses self.theme_config to get details of what colours need to be mapped to new colours
+    def createSVG (self, original_file, new_file):
+        new_colours = self.theme_config.getCustomColours()
+        try:
+            with open(original_file, &quot;r&quot;) as infile:
+                with open(new_file, &quot;w&quot;) as outfile:
+                    for line in infile:
+                        outline = line
+                        for key,value in new_colours.items():
+                            # Uses replace method to swap colour for the new colour
+                            # If we have a match then leave
+                            this_def_colour_tuple = self.theme_config.getDefaultColour(key)
+                            this_def_colour = &quot;({},{},{})&quot;.format(this_def_colour_tuple[0], this_def_colour_tuple[1], this_def_colour_tuple[2])
+                            if (outline.find(this_def_colour) != -1):
+                                this_colour = &quot;({},{},{})&quot;.format(new_colours[key][0], new_colours[key][1], new_colours[key][2])
+                                outline = line.replace(this_def_colour, this_colour)
+                                # Exit the loop so as not to swap multiple times
+                                break
+                        outfile.write(outline)
+            infile.close()
+            outfile.close()
+            return True
+        except Exception as e:
+            print (&quot;Error creating new config file&quot;)
+            print (e)
+            return False
+
+# Handles Custom Controller Menu
+# Status values
+STATUS_MENU = 0
+STATUS_CLICKED = 1
+STATUS_CUSTOM_KEY = 2
+
+class CustomControls:
+
+
+    menu_spacing = 35 # distance between menu items
+    top_spacing = 20  # distance between top of menu and start of menu
+    left_spacing = 20 # distance between left and text for page text / command text
+    menu_font_size = 32   # size of font for menu items
+    status = STATUS_MENU         # Track whether to display menu or in menu etc.
+
+
+    # Requires width and height - these can be the same as the screen or smaller if need to constrain menu
+    # Offset and border determine distance from origin of screen and any fixed area to avoid respectively
+    def __init__(self, game_controls, width=800, height=600, offset=(0,0), border=100):
+        self.game_controls = game_controls
+        self.width = width              # width of screen
+        self.height = height            # height of screen
+        self.offset = offset            # tuple x,y for offset from start of screen
+        self.border = border            # single value same for x and y
+        # Start position of the menu area and size
+        self.start_pos = (self.offset[0]+self.border, self.offset[1]+self.border)
+        self.size = (self.width-2*self.start_pos[0], self.height-2*self.start_pos[1])
+
+        # Create a menu surface - this involves using pygame surface feature (rather than through pygame zero)
+        # Allows for more advanced features such as alpha adjustment (partial transparency)
+        self.menu_surface = Surface(self.size)
+        # 75% opacity
+        self.menu_surface.set_alpha(192)
+
+        # Position of rect is 0,0 relative to the surface, not the screen
+        self.menu_box = Rect((0,0),self.size)
+        # Uses pygame rect so we can add it to own surface
+        self.menu_rect = pygame.draw.rect(self.menu_surface , (200,200,200), self.menu_box)
+        self.menu_pos = 0       # Tracks which menu item is selected
+
+
+        # Timer restrict keyboard movements to prevent multiple presses
+        self.menu_timer = Timer(0.12)
+
+        self.updateMenuItems()
+
+
+
+    # Updates the menu items - run this whenever the menu changes
+    def updateMenuItems(self):
+
+        self.menu_items = []
+        # Store keys in an array to fix order and make easier to identify selected key
+        for this_key in self.game_controls.getKeys():
+            self.menu_items.append(MenuItem(this_key+&quot; (&quot;+str(self.game_controls.getKeyString(this_key))+&quot;)&quot;, this_key, &#x27;control&#x27;))
+
+        # Dummy entry - blank line
+        self.menu_items.append(MenuItem(&quot;&quot;,&quot;&quot;,&quot;controls&quot;))
+        # Last Menu item is to save and return
+        self.menu_items.append(MenuItem(&quot;Save settings&quot;, &#x27;save&#x27;, &#x27;menu&#x27;))
+
+
+
+    # Update menu based on keyboard direction
+    # If return is &#x27;controls&#x27; then still in custon controls, so don&#x27;t update anything else
+    # If return is &#x27;menu&#x27; then return to main game menu
+    def update(self, keyboard):
+        # Handle erquest for new key
+        if (self.status == STATUS_CUSTOM_KEY and self.menu_timer.getTimeRemaining() &lt;= 0):
+            keycode = self.checkKey(keyboard)
+            if (keycode != None):
+                self.game_controls.setKey(self.selected_key, keycode)
+                self.menu_timer.startCountDown()
+                self.status = STATUS_MENU
+            self.updateMenuItems()
+            return &#x27;controls&#x27;
+        # check if status is clicked - which means mouse was pressed on a valid entry
+        if (self.status == STATUS_CLICKED):
+            self.selected_key = self.menu_items[self.menu_pos].getCommand()
+            self.reset()
+            self.status = STATUS_CUSTOM_KEY
+        # check if we are in menu timer in which case return until expired
+        elif (self.menu_timer.getTimeRemaining() &gt; 0):
+            return &#x27;controls&#x27;
+        elif (self.game_controls.isPressed(keyboard,&#x27;up&#x27;) and self.menu_pos&gt;0):
+            if (self.status == STATUS_MENU):
+                self.menu_pos -= 1
+                self.menu_timer.startCountDown()
+        elif (self.game_controls.isPressed(keyboard,&#x27;down&#x27;) and self.menu_pos&lt;len(self.menu_items)-1):
+            if (self.status == STATUS_MENU):
+                self.menu_pos += 1
+                self.menu_timer.startCountDown()
+        elif (self.game_controls.isOrPressed(keyboard,[&#x27;jump&#x27;,&#x27;duck&#x27;])):
+            if (self.status == STATUS_MENU):
+                self.selected_key = self.menu_items[self.menu_pos].getCommand()
+                self.reset()
+                # special case where selected_key is the save option
+                if (self.selected_key == &#x27;save&#x27;):
+                    # Save the controls
+                    self.game_controls.saveControls()
+                    return &#x27;menu&#x27;
+                # Another special case - blank entry used as a spacer
+                # Ignore and continue with custom controls menu
+                elif (self.selected_key == &#x27;&#x27;):
+                    self.menu_timer.startCountDown()
+                    return &#x27;controls&#x27;
+                self.status = STATUS_CUSTOM_KEY
+        elif (self.game_controls.isPressed(keyboard,&#x27;escape&#x27;)):
+            return &#x27;menu&#x27;
+        return &#x27;controls&#x27;
+
+    # Checks pygame event queue for last key pressed
+    def checkKey(self, keyboard):
+        # Check all keycodes to see if any are high
+        for this_code in keycodes:
+            if (keyboard[this_code]):
+                    return this_code
+        return None
+
+
+
+    def draw(self, screen):
+        # Create a rectangle across the area - provides transparancy
+        screen.blit(self.menu_surface,self.start_pos)
+        # draw directly onto the screen draw surface (transparency doesn&#x27;t apply)
+        if (self.status == STATUS_MENU):
+            self.drawMenu(screen)
+        elif (self.status == STATUS_CUSTOM_KEY):
+            self.drawCustom(screen)
+
+
+    def drawCustom(self, screen):
+        screen.draw.text(&quot;Press custom key for &quot;+self.selected_key, fontsize=self.menu_font_size, midtop=(self.width/2,self.offset[1]+self.border+(self.menu_spacing)+self.top_spacing), color=(0,0,0))
+
+
+    def drawMenu(self, screen):
+        for menu_num in range (0,len(self.menu_items)):
+            if (menu_num == self.menu_pos):
+                background_color = (255,255,255)
+            else:
+                background_color = None
+            screen.draw.text(self.menu_items[menu_num].getText(), fontsize=self.menu_font_size, midtop=(self.width/2,self.offset[1]+self.border+(self.menu_spacing*menu_num)+self.top_spacing), color=(0,0,0), background=background_color)
+
+
+    def mouse_move(self, pos):
+        if (self.status == STATUS_MENU):
+            return_val = self.get_mouse_menu_pos(pos)
+            if return_val != -1:
+                self.menu_pos = return_val
+
+
+    def mouse_click(self, pos):
+        if (self.status == STATUS_MENU):
+            return_val = self.get_mouse_menu_pos(pos)
+            if return_val != -1:
+                self.menu_pos = return_val
+                self.status = STATUS_CLICKED
+        # If click from text page then return to menu
+        elif (self.status == STATUS_PAGE):
+            self.status = STATUS_MENU
+
+    def select(self):
+        self.menu_timer.startCountDown()
+
+
+    def reset(self):
+        self.menu_timer.startCountDown()
+        self.menu_pos = 0
+        self.status = STATUS_MENU
+
+
+    # Checks if mouse is over menu and if so returns menu position
+    # Otherwise returns -1
+    def get_mouse_menu_pos (self, pos):
+        if (pos[0] &gt; self.start_pos[0] and pos[1] &gt; self.start_pos[1] + self.top_spacing and pos[0] &lt; self.start_pos[0] + self.size[0] and pos[1] &lt; self.start_pos[1] + self.size[1]):
+            start_y = self.start_pos[1] + self.top_spacing
+            for this_menu_pos in range(0,len(self.menu_items)):
+                if (pos[1] - start_y &gt;= this_menu_pos * self.menu_spacing and pos[1] - start_y &lt;= (this_menu_pos * self.menu_spacing)+self.menu_spacing):
+                    return this_menu_pos
+        # If not returned then not over menu
+        return -1
+
+# Need to use RETURN in pgzero keyboard - whilst waiting for fix under pgzero #134 to filter through
+# Disable depreceation warnings
+import warnings
+warnings.filterwarnings(&quot;ignore&quot;, category=DeprecationWarning)
+
+WIDTH = 800
+HEIGHT = 600
+TITLE = &quot;Compass Game&quot;
+# Unlike other images in pgzero ICON needs to have the file extension
+ICON = &quot;icon.png&quot;
+
+# Filename format - uses python format to add appropriate values
+# Variables are: theme (eg. boy/girl), character_number (00=default), direction (down=default), seq_num / step count (01 = default)
+#Images for player in each direction - does not include final digit which is the image number
+#All must have 4 images ending with 1 to 4, except for jump and duck which only ends with 1
+# &#x27;down&#x27;, &#x27;up&#x27;, &#x27;left&#x27;, &#x27;right&#x27;, &#x27;jump&#x27;, &#x27;duck&#x27;
+#For this game jump is used, but is represented as reading a map
+# PLAYER_TEXT_IMG_FORMAT - formats strings, PLAYER_TEXT_FORMAT is the same, but converts numbers for 2nd and 4th entries
+PLAYER_TEXT_IMG_FORMAT = &quot;person_{}_{}_{}_{}&quot;
+# Not a constant, but won&#x27;t change after this.
+player_img_format = PLAYER_TEXT_IMG_FORMAT.format(&quot;{}&quot;,&quot;{:02d}&quot;,&quot;{}&quot;,&quot;{:02d}&quot;)
+# Same background can be applied for each level or one per level - if only some have backgrounds then the last one is used for all subsequent levels
+# background 00 is used by the menu
+# eg. person_default_01_forward_01
+BACKGROUND_IMG_FORMAT = &quot;background_{:02d}&quot;
+# The number of levels that have background images - if 0 then uses default of 00)
+BACKGROUND_NUM_IMGS = 2
+# Obstacles - if prefer one to be more common then needs to be duplicated (eg. 2 x identical images more likely than 1)
+OBSTACLE_IMG_FORMAT = &quot;obstacle_{:02d}&quot;
+# The number of obstacles - starts at 01
+OBSTACLE_NUM_IMGS = 6
+
+
+# File holding high score
+HIGH_SCORE_FILENAME = &#x27;compassgame_score.dat&#x27;
+# File holding custom controls
+CUSTOM_CONTROL_FILENAME  = &#x27;compassgame_controls.dat&#x27;
+
+#Dictionary with messages to show to user for action to carry out
+action_text = {&#x27;north&#x27;:&#x27;Go north&#x27;, &#x27;south&#x27;:&#x27;Go south&#x27;,
+    &#x27;east&#x27;:&#x27;Go east&#x27;, &#x27;west&#x27;:&#x27;Go west&#x27;,
+    &#x27;duck&#x27;:&#x27;Quick duck!&#x27;, &#x27;jump&#x27;:&#x27;Check the map&#x27;}
+
+
+# Track Status etc
+game_status = GamePlay(action_text)
+# Handles key interaction
+game_controls = GameControls(CUSTOM_CONTROL_FILENAME)
+
+# Track high score
+high_score = HighScore(game_controls, HIGH_SCORE_FILENAME)
+
+# These are used for the menu sub commands - must be classes
+# Must implement show() display() mouse_move() and mouse_click() select()
+sub_commands = {
+    &#x27;character&#x27; : CustomCharacter(game_controls, PLAYER_TEXT_IMG_FORMAT),
+    &#x27;controls&#x27; : CustomControls(game_controls, WIDTH, HEIGHT),
+    &#x27;highscore&#x27; : high_score
+}
+
+
+
+# allows different character looks - must come after the sub_commands are defined
+(theme, theme_num) = sub_commands[&#x27;character&#x27;].getTheme()
+
+
+# Player - baseed on PlayActor which inherits from Actor
+player = PlayerActor(theme, theme_num, player_img_format, WIDTH,HEIGHT)
+
+
+#Obstacles - these are actors, but stationary ones - default positions
+obstacles = []
+# Positions to place obstacles Tuples: (x,y)
+obstacle_positions = [(200,200), (400, 400), (500,500), (80,120), (700, 150), (750,540), (200,550), (60,320), (730, 290), (390,170), (420,500) ]
+
+menu = GameMenu(game_controls, WIDTH,HEIGHT)
+
+
+#Rectangles for compass points for collision detection to ensure player is in correct position
+box_size = 50
+north_box = Rect((0, 0), (WIDTH, box_size))
+east_box = Rect((WIDTH-box_size, 0), (WIDTH, HEIGHT))
+south_box = Rect((0, HEIGHT-box_size), (WIDTH, HEIGHT))
+west_box = Rect((0, 0), (box_size, HEIGHT))
+
+
+
+def draw():
+    # Check for sub command first as they use own background image
+    if (game_status.isSubCommand()):
+        sub_commands[game_status.getSubCommand()].draw(screen)
+        return
+
+    # Draw background
+    screen.blit(get_background_img(game_status.getLevel()), (0,0))
+
+    if (game_status.isGameOver() or game_status.isShowScore()):
+        screen.draw.text(&quot;Game Over\nScore &quot;+str(game_status.getScore()), fontsize=60, center=(WIDTH/2,200), color=(89,6,13))
+        high_score.showScores(screen, (200,270))
+    if (game_status.isMenu()):
+        menu.show(screen)
+    elif (game_status.isTitleScreen()):
+        # If want anything on title screen insert here
+        # Must exist with pass if nothing else
+        pass
+    elif (game_status.isShowScore()):
+        pass
+    else:
+        time_remaining_secs = math.floor(game_status.getTimeRemaining())
+        screen.draw.text(&#x27;Time: &#x27;+str(time_remaining_secs), fontsize=60, center=(100,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        screen.draw.text(&#x27;Score &#x27;+str(game_status.getScore()), fontsize=60, center=(WIDTH-130,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        # Only show state if not timer paused
+        if (not game_status.isTimerPause()):
+            screen.draw.text(game_status.getStateString(), fontsize=60, center=(WIDTH/2,50), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+        player.draw()
+        # Draw obstacles
+        for i in range (0,len(obstacles)):
+            obstacles[i].draw()
+
+        # If want a message over the top of the screen then add here (eg. pause / level up)
+        if (game_status.getGameMessage() != &quot;&quot;):
+            screen.draw.text(game_status.getGameMessage(), fontsize=60, center=(WIDTH/2,HEIGHT/2), shadow=(1,1), color=(255,255,255), scolor=&quot;#202020&quot;)
+
+
+def update():
+    # Check for pause status if so only look for key press
+    if (game_status.isUserPause()):
+        # duck or jump to unpause (if want to use p button would need to add delay to prevent rapid toggling)
+        if (game_control.isOrPressed(keyboard, [&#x27;jump&#x27;, &#x27;duck&#x27;])):
+            game_status.setUserPause(False)
+        else:
+            return
+    # Check for timer pause - if so return until expired
+    if (game_status.isTimerPause()):
+        return
+    # Reset message after timer finished
+    game_status.setGameMessage(&quot;&quot;)
+
+    if game_status.isTitleScreen():
+        # first_run prevents timer
+        game_status.setMenu(first_run = True)
+
+
+    # Call menu update function, if return is not 0 then continue with rest of updates
+    # If return is 0 then still in menu, so don&#x27;t update anything else
+    # If negative then quit the application
+    if (game_status.isMenu()):
+        result = menu.update(keyboard)
+        if (result == &#x27;menu&#x27;):
+            # Still in menu (displayed through show())
+            return
+        elif (result == &#x27;quit&#x27; ):
+            quit()
+        elif (result == &#x27;start&#x27; ):
+            game_status.startNewGame()
+        # Otherwise likely to be subcommand
+        elif result in sub_commands:
+            game_status.setSubCommand(result)
+            # Starts the timer
+            sub_commands[result].select()
+
+
+    if (game_status.isSubCommand()):
+        result = sub_commands[game_status.getSubCommand()].update(keyboard)
+        if result == &#x27;menu&#x27;:
+            game_status.setMenu()
+            # Update any settings that may have changed
+            refreshSettings()
+        # Any other return and we stay where we are
+        return
+
+
+    if (game_status.isGameOver()):
+        if high_score.checkHighScore(game_status.getScore()) :
+            high_score.setHighScore(game_status.getScore())
+            game_status.setSubCommand(&#x27;highscore&#x27;)
+            sub_commands[&#x27;highscore&#x27;].select()
+        else:
+            game_status.setShowScore()
+
+
+    # If status is not running then we give option to start or quit
+    if (game_status.isNewGame() or game_status.isScoreShown()):
+        # Display instructions (in draw() rather than here)
+        if (game_controls.isPressed(keyboard, &#x27;escape&#x27;)):
+            quit()
+        # If jump / duck then go to menu
+        if (game_controls.isOrPressed(keyboard, [&#x27;jump&#x27;, &#x27;duck&#x27;])):
+            # Reset player and game including score
+            player.reset()
+            game_satus.reset()
+            game_status.setMenu()
+            # Reset number of obstacles etc.
+            set_level_display(game_status.getLevel())
+
+        return
+
+
+    if (game_status.isGameRunning and game_status.getTimeRemaining() &lt; 1):
+        game_status.setGameOver()
+        return
+
+
+    handle_keyboard()
+
+    # Has player hit an obstacle?
+    if (hit_obstacle()):
+        game_status.setGameOver()
+        return
+
+    check_position()
+
+
+def on_mouse_move(pos):
+    if (game_status.isMenu()):
+        menu.mouse_move(pos)
+
+def on_mouse_down(pos, button):
+    # Only look for left button
+    if (button != mouse.LEFT):
+        return
+    if (game_status.isMenu()):
+        menu.mouse_click(pos)
+    # If status waiting on click to go to menu allow this to be mouse
+    if (game_status.isNewGame() or game_status.isScoreShown()):
+        # Reset player including score
+        player.reset()
+        game_status.setMenu()
+        # Reset number of obstacles etc.
+        set_level_display(game_status.getLevel())
+    # If sub command pass on to command
+    if (game_status.isSubCommand()):
+        sub_commands[game_status.getSubCommand()].mouse_click(pos)
+
+
+
+# Checks if target readhed, if so add score, see if level required
+def check_position():
+    # Determine if player has reached where they should be
+    if (reach_target(game_status.getCurrentMove())):
+        current_level = game_status.getLevel()
+        new_level = game_status.scorePoint()
+
+        # If level changed when adding point
+        if (current_level != new_level):
+            #Move player back to center for level up
+            player.setPosition(WIDTH/2,HEIGHT/2)
+            player.setDirection(&#x27;down&#x27;)
+            game_status.setGameMessage(&quot;Level Up!\n&quot;+str(new_level))
+            game_status.startTimerPause()
+            set_level_display(new_level)
+
+
+
+# Actions based on keyboard press (includes joystick / buttons on picade)
+def handle_keyboard():
+    # Check for direction keys pressed
+    # Can have multiple pressed in which case we move in all the directions
+    # The last one in the order below is set as the direction to determine the
+    # image to use
+    new_direction = &#x27;&#x27;
+
+    # Check for pause button first
+    if (game_controls.isPressed(keyboard,&#x27;pause&#x27;)):
+        game_status.setUserPause()
+
+    # Duck or Jump - don&#x27;t move character, but change image
+    # Allow two different keys for both these
+    if (game_controls.isPressed(keyboard, &#x27;duck&#x27;)):
+        new_direction = &#x27;duck&#x27;
+    elif (game_controls.isPressed(keyboard, &#x27;jump&#x27;)):
+        new_direction = &#x27;jump&#x27;
+        # Only handle direction buttons if duck or jump have not been selected (prevent ducking constantly and moving)
+    else:
+        if (game_controls.isPressed(keyboard,&#x27;up&#x27;)):
+            new_direction = &#x27;up&#x27;
+            player.moveActor(new_direction)
+        if (game_controls.isPressed(keyboard,&#x27;down&#x27;)):
+            new_direction = &#x27;down&#x27;
+            player.moveActor(new_direction)
+        if (game_controls.isPressed(keyboard,&#x27;left&#x27;)) :
+            new_direction = &#x27;left&#x27;
+            player.moveActor(new_direction)
+        if (game_controls.isPressed(keyboard,&#x27;right&#x27;)) :
+            new_direction = &#x27;right&#x27;
+            player.moveActor(new_direction)
+
+
+    # Also check for jump / duck being deselected as we need to move back to a normal position
+    if (player.isJumpDuck() and new_direction == &#x27;&#x27;):
+        # move to default down direction
+        player.updImage(&#x27;down&#x27;)
+    # If new direction is not &quot;&quot; then we have a move button pressed
+    # so set appropriate image
+    if (new_direction != &quot;&quot;):
+        # Set image based on new_direction
+        player.updImage(new_direction)
+
+
+# Determine if the player has reached target
+# Can be either certain position on screen (Rects defined earlier) or duck / map(jump)
+def reach_target(target_pos):
+    if (target_pos == &#x27;north&#x27;):
+        if (player.colliderect(north_box)): return True
+        else: return False
+    elif (target_pos == &#x27;south&#x27;):
+        if (player.colliderect(south_box)): return True
+        else: return False
+    elif (target_pos == &#x27;east&#x27;):
+        if (player.colliderect(east_box)): return True
+        else: return False
+    elif (target_pos == &#x27;west&#x27;):
+        if (player.colliderect(west_box)): return True
+        else: return False
+    # These are just based on the direction of the player (ie. are they ducking / reading the map (jump))
+    elif (target_pos == player.getDirection()):
+        return True
+    # If none of above met then False
+    return False
+
+
+
+# Set new level by setting correct background and adding appropriate obstacles to list
+def set_level_display(level_number):
+    global obstacles
+
+    game_level = level_number
+    # Delete current obstacles
+    obstacles = []
+
+    # Start adding obstacles from level 3
+    if (level_number &lt; 3):
+        return
+
+    # Max we can have is the number of obstacle_positions
+    for i in range (0,len(obstacle_positions)):
+        # quit when we have reached correct number for this level (equal to the level number -2 so first level with obstacles is level 3 with 2)
+        if (i &gt; (level_number - 2)):
+            break
+        obstacles.append(Actor(OBSTACLE_IMG_FORMAT.format(random.randint(0,OBSTACLE_NUM_IMGS)), obstacle_positions[i]))
+
+
+def hit_obstacle():
+    for i in range (0,len(obstacles)):
+        if player.colliderect(obstacles[i]):
+            return True
+    return False
+
+# Gets background image (filename - excluding ext) based on format (if not enough then return last one)
+def get_background_img(game_level):
+    # If level higher than num images return last entry
+    if game_level &gt; BACKGROUND_NUM_IMGS:
+        game_level = BACKGROUND_NUM_IMGS
+    return BACKGROUND_IMG_FORMAT.format(game_level)
+
+
+# Update any settings that may have changed during a menu operation
+def refreshSettings():
+    player.setTheme(sub_commands[&#x27;character&#x27;].getTheme())
+
+
+</code></pre>
+</main>
+
+<script>
+/*
+ * Compass Game - PyGame Zero
+ */
+
+window.addEventListener('load', (event) => {
+  screen.init();
+});
+</script>
+</body>
+
+</html>
