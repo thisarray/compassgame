@@ -2137,6 +2137,456 @@ def refreshSettings():
 /*
  * Compass Game - PyGame Zero
  */
+WIDTH = 800;
+HEIGHT = 600;
+TITLE = "Compass Game";
+
+/*
+ * Same background can be applied for each level or one per level - if only some have backgrounds then the last one is used for all subsequent levels
+ * background 00 is used by the menu
+ * eg. person_default_01_forward_01
+ * The number of levels that have background images - if 0 then uses default of 00)
+ */
+const BACKGROUND_NUM_IMGS = 2;
+
+/*
+ * Obstacles - if prefer one to be more common then needs to be duplicated (eg. 2 x identical images more likely than 1)
+ * The number of obstacles - starts at 01
+ */
+const OBSTACLE_NUM_IMGS = 6;
+
+/*
+ * Dictionary with messages to show to user for action to carry out
+ */
+const ACTION_TEXT = new Map([
+  ['north', 'Go north'],
+  ['south', 'Go south'],
+  ['east', 'Go east'],
+  ['west', 'Go west'],
+  ['duck', 'Quick duck!'],
+  ['jump', 'Check the map']
+]);
+
+/*
+ * Track Status etc
+ */
+const GAME_STATUS = new GamePlay(ACTION_TEXT);
+
+/*
+ * Handles key interaction
+ */
+const GAME_CONTROLS = new GameControls();
+
+/*
+ * Track high score
+ */
+const HIGH_SCORE = new HighScore(GAME_CONTROLS);
+
+/*
+ * These are used for the menu sub commands - must be classes
+ * Must implement show() display() mouse_move() and mouse_click() select()
+ */
+const SUB_COMMANDS = new Map([
+  ['character', new CustomCharacter(GAME_CONTROLS, PLAYER_TEXT_IMG_FORMAT)],
+  ['controls', new CustomControls(GAME_CONTROLS, WIDTH, HEIGHT)],
+  ['highscore', HIGH_SCORE]
+]);
+
+/*
+ * Positions to place obstacles Tuples: (x,y)
+ */
+const OBSTACLE_POSITIONS = [[200, 200], [400, 400], [500, 500], [80, 120], [700, 150], [750, 540], [200, 550], [60, 320], [730, 290], [390, 170], [420, 500]];
+
+// Rectangles for compass points for collision detection to ensure player is in correct position
+const BOX_SIZE = 50;
+const NORTH_BOX = new Rect([0, 0], [WIDTH, BOX_SIZE]);
+const EAST_BOX = new Rect([WIDTH - BOX_SIZE, 0], [WIDTH, HEIGHT]);
+const SOUTH_BOX = new Rect([0, HEIGHT - BOX_SIZE], [WIDTH, HEIGHT]);
+const WEST_BOX = new Rect([0, 0], [BOX_SIZE, HEIGHT]);
+
+let player, obstacles, menu;
+
+function reset() {
+  // allows different character looks - must come after the sub_commands are defined
+  let [theme, theme_num] = SUB_COMMANDS.get('character').getTheme();
+
+  // Player - baseed on PlayActor which inherits from Actor
+  player = new PlayerActor(theme, theme_num, player_img_format, WIDTH, HEIGHT);
+
+  // Obstacles - these are actors, but stationary ones - default positions
+  obstacles = [];
+
+  menu = new GameMenu(GAME_CONTROLS, WIDTH, HEIGHT);
+}
+
+function draw() {
+  // Check for sub command first as they use own background image
+  if (GAME_STATUS.isSubCommand()) {
+    SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).draw(screen);
+    return;
+  }
+
+  // Draw background
+  screen.blit(get_background_img(GAME_STATUS.getLevel()), [0, 0]);
+
+  if (GAME_STATUS.isGameOver() || GAME_STATUS.isShowScore()) {
+    screen.draw.text("Game Over\nScore " + GAME_STATUS.getScore(), {
+      fontsize: 60,
+      center: [WIDTH / 2, 200],
+      color: [89, 6, 13]
+    });
+    HIGH_SCORE.showScores(screen, [200, 270]);
+  }
+  if (GAME_STATUS.isMenu()) {
+    menu.show(screen);
+  }
+  else if (GAME_STATUS.isTitleScreen()) {
+    // If want anything on title screen insert here
+    // Must exist with pass if nothing else
+  }
+  else if (GAME_STATUS.isShowScore()) {
+  }
+  else {
+    let time_remaining_secs = Math.floor(GAME_STATUS.getTimeRemaining());
+    screen.draw.text('Time: ' + time_remaining_secs, {
+      fontsize: 60,
+      center: [100, 50],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+    screen.draw.text('Score ' + GAME_STATUS.getScore(), {
+      fontsize: 60,
+      center: [WIDTH - 130, 50],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+    // Only show state if not timer paused
+    if (!GAME_STATUS.isTimerPause()) {
+      screen.draw.text(GAME_STATUS.getStateString(), {
+        fontsize: 60,
+        center: [WIDTH / 2, 50],
+        shadow: [1, 1],
+        color: [255, 255, 255],
+        scolor: "#202020"
+      });
+    }
+    player.draw();
+    // Draw obstacles
+    for (let obstacle of obstacles) {
+      obstacle.draw();
+    }
+
+    // If want a message over the top of the screen then add here (eg. pause / level up)
+    if (GAME_STATUS.getGameMessage() !== "") {
+      screen.draw.text(GAME_STATUS.getGameMessage(), {
+        fontsize: 60,
+        center: [WIDTH / 2, HEIGHT / 2],
+        shadow: [1, 1],
+        color: [255, 255, 255],
+        scolor: "#202020"
+      });
+    }
+  }
+}
+
+function update(dt) {
+  // Check for pause status if so only look for key press
+  if (GAME_STATUS.isUserPause()) {
+    // duck or jump to unpause (if want to use p button would need to add delay to prevent rapid toggling)
+    if (GAME_CONTROLS.isOrPressed(keyboard, ['jump', 'duck'])) {
+      GAME_STATUS.setUserPause(false);
+    }
+    else {
+      return;
+    }
+  }
+  // Check for timer pause - if so return until expired
+  if (GAME_STATUS.isTimerPause()) {
+    return;
+  }
+  // Reset message after timer finished
+  GAME_STATUS.setGameMessage("");
+
+  if (GAME_STATUS.isTitleScreen()) {
+    // first_run prevents timer
+    GAME_STATUS.setMenu(true);
+  }
+
+
+  // Call menu update function, if return is not 0 then continue with rest of updates
+  // If return is 0 then still in menu, so don't update anything else
+  // If negative then quit the application
+  if (GAME_STATUS.isMenu()) {
+    let result = menu.update(keyboard);
+    if (result === 'menu') {
+      // Still in menu (displayed through show())
+      return;
+    }
+    else if (result === 'start') {
+      GAME_STATUS.startNewGame();
+    }
+    // Otherwise likely to be subcommand
+    else if (SUB_COMMANDS.has(result)) {
+      GAME_STATUS.setSubCommand(result);
+      // Starts the timer
+      SUB_COMMANDS.get(result).select();
+    }
+  }
+
+
+  if (GAME_STATUS.isSubCommand()) {
+    let result = SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).update(keyboard);
+    if (result === 'menu') {
+      GAME_STATUS.setMenu();
+      // Update any settings that may have changed
+    }
+    // Any other return and we stay where we are
+    return;
+  }
+
+
+  if (GAME_STATUS.isGameOver()) {
+    if (HIGH_SCORE.checkHighScore(GAME_STATUS.getScore())) {
+      HIGH_SCORE.setHighScore(GAME_STATUS.getScore());
+      GAME_STATUS.setSubCommand('highscore');
+      SUB_COMMANDS.get('highscore').select();
+    }
+    else {
+      GAME_STATUS.setShowScore();
+    }
+  }
+
+
+  // If status is not running then we give option to start or quit
+  if (GAME_STATUS.isNewGame() || GAME_STATUS.isScoreShown()) {
+    // Display instructions (in draw() rather than here)
+    // If jump / duck then go to menu
+    if (GAME_CONTROLS.isOrPressed(keyboard, ['jump', 'duck'])) {
+      // Reset player and game including score
+      player.reset();
+      GAME_STATUS.reset();
+      GAME_STATUS.setMenu();
+      // Reset number of obstacles etc.
+      set_level_display(GAME_STATUS.getLevel());
+    }
+
+    return;
+  }
+
+
+  if (GAME_STATUS.isGameRunning && (GAME_STATUS.getTimeRemaining() < 1)) {
+    GAME_STATUS.setGameOver();
+    return;
+  }
+
+
+  handle_keyboard();
+
+  // Has player hit an obstacle?
+  if (hit_obstacle()) {
+    GAME_STATUS.setGameOver();
+    return;
+  }
+
+  check_position();
+}
+
+function on_mouse_move(pos) {
+  if (GAME_STATUS.isMenu()) {
+    menu.mouse_move(pos);
+  }
+}
+
+function on_mouse_down(pos, button) {
+  // Only look for left button
+  if ((button & mouse.LEFT) <= 0) {
+    return;
+  }
+  if (GAME_STATUS.isMenu()) {
+    menu.mouse_click(pos);
+  }
+  // If status waiting on click to go to menu allow this to be mouse
+  if (GAME_STATUS.isNewGame() || GAME_STATUS.isScoreShown()) {
+    // Reset player including score
+    player.reset();
+    GAME_STATUS.setMenu();
+    // Reset number of obstacles etc.
+    set_level_display(GAME_STATUS.getLevel());
+  }
+  // If sub command pass on to command
+  if (GAME_STATUS.isSubCommand()) {
+    SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).mouse_click(pos);
+  }
+}
+
+/*
+ * Checks if target readhed, if so add score, see if level required
+ */
+function check_position() {
+  // Determine if player has reached where they should be
+  if (reach_target(GAME_STATUS.getCurrentMove())) {
+    let current_level = GAME_STATUS.getLevel(),
+        new_level = GAME_STATUS.scorePoint();
+
+    // If level changed when adding point
+    if (current_level !== new_level) {
+      //Move player back to center for level up
+      player.setPosition(WIDTH / 2, HEIGHT / 2);
+      player.setDirection('down');
+      GAME_STATUS.setGameMessage("Level Up!\n" + new_level);
+      GAME_STATUS.startTimerPause()
+      set_level_display(new_level);
+    }
+  }
+}
+
+/*
+ * Actions based on keyboard press (includes joystick / buttons on picade)
+ */
+function handle_keyboard() {
+  // Check for direction keys pressed
+  // Can have multiple pressed in which case we move in all the directions
+  // The last one in the order below is set as the direction to determine the
+  // image to use
+  let new_direction = '';
+
+  // Check for pause button first
+  if (GAME_CONTROLS.isPressed(keyboard, 'pause')) {
+    GAME_STATUS.setUserPause();
+  }
+
+  // Duck or Jump - don't move character, but change image
+  // Allow two different keys for both these
+  if (GAME_CONTROLS.isPressed(keyboard, 'duck')) {
+    new_direction = 'duck';
+  }
+  else if (GAME_CONTROLS.isPressed(keyboard, 'jump')) {
+    new_direction = 'jump';
+    // Only handle direction buttons if duck or jump have not been selected (prevent ducking constantly and moving)
+  }
+  else {
+    if (GAME_CONTROLS.isPressed(keyboard, 'up')) {
+      new_direction = 'up';
+      player.moveActor(new_direction);
+    }
+    if (GAME_CONTROLS.isPressed(keyboard, 'down')) {
+      new_direction = 'down';
+      player.moveActor(new_direction);
+    }
+    if (GAME_CONTROLS.isPressed(keyboard, 'left')) {
+      new_direction = 'left';
+      player.moveActor(new_direction);
+    }
+    if (GAME_CONTROLS.isPressed(keyboard, 'right')) {
+      new_direction = 'right';
+      player.moveActor(new_direction);
+    }
+  }
+
+
+  // Also check for jump / duck being deselected as we need to move back to a normal position
+  if (player.isJumpDuck() && (new_direction === '')) {
+    // move to default down direction
+    player.updImage('down');
+  }
+  // If new direction is not "" then we have a move button pressed
+  // so set appropriate image
+  if (new_direction !== "") {
+    // Set image based on new_direction
+    player.updImage(new_direction);
+  }
+}
+
+/*
+ * Determine if the player has reached target
+ * Can be either certain position on screen (Rects defined earlier) or duck / map(jump)
+ */
+function reach_target(target_pos) {
+  if (target_pos === 'north') {
+    if (player.colliderect(north_box)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else if (target_pos === 'south') {
+    if (player.colliderect(south_box)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else if (target_pos === 'east') {
+    if (player.colliderect(east_box)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else if (target_pos === 'west') {
+    if (player.colliderect(west_box)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  // These are just based on the direction of the player (ie. are they ducking / reading the map (jump))
+  else if (target_pos === player.getDirection()) {
+    return true;
+  }
+  // If none of above met then False
+  return false;
+}
+
+/*
+ * Set new level by setting correct background and adding appropriate obstacles to list
+ */
+function set_level_display(level_number) {
+  // Delete current obstacles
+  obstacles = [];
+
+  // Start adding obstacles from level 3
+  if (level_number < 3) {
+    return;
+  }
+
+  // Max we can have is the number of obstacle_positions
+  for (let i = 0; i < OBSTACLE_POSITIONS.length; i++) {
+    // quit when we have reached correct number for this level (equal to the level number -2 so first level with obstacles is level 3 with 2)
+    if (i > (level_number - 2)) {
+      break;
+    }
+    obstacle = new Actor("obstacle_" + getRandomInteger(0, OBSTACLE_NUM_IMGS + 1).toFixed().padStart(2, '0'));
+    obstacle.pos = OBSTACLE_POSITIONS[i];
+    obstacles.push(obstacle);
+  }
+}
+
+function hit_obstacle() {
+  for (let obstacle of obstacles) {
+    if (player.colliderect(obstacle)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/*
+ * Gets background image (filename - excluding ext) based on format (if not enough then return last one)
+ */
+function get_background_img(game_level) {
+  // If level higher than num images return last entry
+  if (game_level > BACKGROUND_NUM_IMGS) {
+    game_level = BACKGROUND_NUM_IMGS;
+  }
+  return "background_" + game_level.toFixed().padStart(2, '0');
+}
 
 window.addEventListener('load', (event) => {
   screen.init();
