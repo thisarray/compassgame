@@ -2137,6 +2137,178 @@ def refreshSettings():
 /*
  * Compass Game - PyGame Zero
  */
+
+/*
+ * Card is based on an Actor (uses inheritance)
+ */
+class PlayerActor extends Actor {
+  /*
+   * num moves per step (ie don't move feet if less than this)
+   * If set too low then legs will move really fast - default 5
+   */
+  static STEP_DELAY = 5;
+
+  // theme is image number
+  constructor(theme, theme_num, player_image_format, screen_width, screen_height) {
+    // Call Actor constructor (center the Actor)
+    super(PlayerActor.getImage(theme, theme_num, 'down', 1));
+
+    // Status can be normal or hidden
+    this.status = 'normal';
+    // Direction that player is facing
+    this.direction = 'down';
+    // walking position of player (number from 1 to 4 represent position of feet)
+    this.player_step_position = 1;
+    // track number of moves per step
+    this.player_step_count = 0;
+
+    this.theme = theme;
+    this.theme_num = theme_num;
+    this.player_image_format = player_image_format;
+    this.screen_width = screen_width;
+    this.screen_height = screen_height;
+    this.pos = [this.screen_width / 2, this.screen_height / 2];
+  }
+
+  // Override Actor.draw
+  draw() {
+    if (this.status === 'hidden') {
+      return;
+    }
+    super.draw();
+  }
+
+  hide() {
+    this.status = 'hidden';
+  }
+
+  // When unhide set it to back image
+  unhide() {
+    this.status = 'normal';
+  }
+
+  isHidden() {
+    if (this.status === 'hidden') {
+      return true;
+    }
+    return false;
+  }
+
+  reset() {
+    this.unhide();
+  }
+
+  toString() {
+    return this.name;
+  }
+
+  setPosition(x, y) {
+    this.posx = x;
+    this.posy = y;
+  }
+
+  // Sets direction and also resets player_step_count
+  setDirection(direction) {
+    this.direction = direction;
+    this.player_step_count = 0;
+    this.player_step_position = 1;
+    this.name = PlayerActor.getImage(this.theme, this.theme_num, this.direction, this.player_step_position);
+  }
+
+  getDirection() {
+    return this.direction;
+  }
+
+  equals(othercard) {
+    if (this.name === othercard.toString()) {
+      return true;
+    }
+    return false;
+  }
+
+  // Move Actor also handles image change
+  moveActor(direction, distance = 5) {
+    if (direction === 'up') {
+      this.posy -= distance;
+    }
+    if (direction === 'right') {
+      this.posx += distance;
+    }
+    if (direction === 'down') {
+      this.posy += distance;
+    }
+    if (direction === 'left') {
+      this.posx -= distance;
+    }
+
+    // Check not moved past the edge of the screen
+    if (this.posy <= 30) {
+      this.posy = 30;
+    }
+    if (this.posx <= 12) {
+      this.posx = 12;
+    }
+    if (this.posy >= (this.screen_height - 30)) {
+      this.posy = this.screen_height - 30;
+    }
+    if (this.posx >= (this.screen_width - 12)) {
+      this.posx = this.screen_width - 12;
+    }
+  }
+
+  // gets image based on status of player
+  static getImage(theme, theme_num, direction, player_step_position) {
+    return `person_${ theme }_${ theme_num.toFixed().padStart(2, '0') }_${ direction }_${ player_step_position.toFixed().padStart(2, '0') }`;
+  }
+
+  isJumpDuck() {
+    if ((this.direction === 'jump') || (this.direction === 'duck')) {
+      return true;
+    }
+    return false;
+  }
+
+  updImage(new_direction) {
+    // Check for duck and jump as don't increment digit & image - we just have one duck / jump image
+    if ((this.direction === new_direction) && ((this.direction === 'duck') || (this.direction === 'jump'))) {
+      return;
+    }
+
+    // If change in direction
+    if (this.direction !== new_direction) {
+      this.player_step_count = 0;
+    }
+    else {
+      this.player_step_count += 1;
+    }
+
+    if (this.player_step_count >= (4 * PlayerActor.STEP_DELAY)) {
+      this.player_step_count = 0;
+    }
+
+    // set the direction to be the new direction
+    this.direction = new_direction;
+    this.player_step_position = Math.floor(this.player_step_count / PlayerActor.STEP_DELAY) + 1;
+    this.name = PlayerActor.getImage(this.theme, this.theme_num, this.direction, this.player_step_position);
+  }
+
+  // Theme and theme_num must be a tuple (which is what CustomCharacter.getTheme() returns)
+  setTheme(theme_tuple) {
+    let [theme, theme_num] = theme_tuple;
+    this.theme = theme;
+    this.theme_num = theme_num;
+    this.updImage("down");
+  }
+
+  reset() {
+    this.score = 0;
+    this.level_actions_complete = 0;
+    this.direction = 'down';
+    this.player_step_position = 1;
+    this.player_step_count = 0;
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
@@ -2341,6 +2513,7 @@ function update(dt) {
     if (result === 'menu') {
       GAME_STATUS.setMenu();
       // Update any settings that may have changed
+      refreshSettings();
     }
     // Any other return and we stay where we are
     return;
@@ -2436,7 +2609,7 @@ function check_position() {
       player.setPosition(WIDTH / 2, HEIGHT / 2);
       player.setDirection('down');
       GAME_STATUS.setGameMessage("Level Up!\n" + new_level);
-      GAME_STATUS.startTimerPause()
+      GAME_STATUS.startTimerPause();
       set_level_display(new_level);
     }
   }
@@ -2505,7 +2678,7 @@ function handle_keyboard() {
  */
 function reach_target(target_pos) {
   if (target_pos === 'north') {
-    if (player.colliderect(north_box)) {
+    if (player.colliderect(NORTH_BOX)) {
       return true;
     }
     else {
@@ -2513,7 +2686,7 @@ function reach_target(target_pos) {
     }
   }
   else if (target_pos === 'south') {
-    if (player.colliderect(south_box)) {
+    if (player.colliderect(SOUTH_BOX)) {
       return true;
     }
     else {
@@ -2521,7 +2694,7 @@ function reach_target(target_pos) {
     }
   }
   else if (target_pos === 'east') {
-    if (player.colliderect(east_box)) {
+    if (player.colliderect(EAST_BOX)) {
       return true;
     }
     else {
@@ -2529,7 +2702,7 @@ function reach_target(target_pos) {
     }
   }
   else if (target_pos === 'west') {
-    if (player.colliderect(west_box)) {
+    if (player.colliderect(WEST_BOX)) {
       return true;
     }
     else {
@@ -2586,6 +2759,13 @@ function get_background_img(game_level) {
     game_level = BACKGROUND_NUM_IMGS;
   }
   return "background_" + game_level.toFixed().padStart(2, '0');
+}
+
+/*
+ * Update any settings that may have changed during a menu operation
+ */
+function refreshSettings() {
+  player.setTheme(SUB_COMMANDS.get('character').getTheme());
 }
 
 window.addEventListener('load', (event) => {
