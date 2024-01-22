@@ -2309,6 +2309,97 @@ class PlayerActor extends Actor {
   }
 }
 
+/*
+ * Simple count down timer, based on system clock
+ */
+class Timer {
+  static TIMERS = [];
+
+  /*
+   * Debug allows print statements to monitor changes
+   * Use for debugging higher level code
+   * Only enable for the particular timer that you need to debug
+   */
+
+  constructor(set_time, debug = false) {
+    this.default_time = set_time;        // default_time is what we revert to when reset
+    this.set_time = set_time;
+    this.active = false;
+    this.elapsed = 0;
+    this.debug = debug;
+    this.printDebug("Init");
+
+    Timer.TIMERS.push(this);
+  }
+
+  // start count down, with optional parameter to replace the start_time value
+  // -1 is used as a "magic number", this method should only be called with positive number
+  // if it isn't given a number then -1 indicates no new time give
+  startCountDown(new_time = -1) {
+    if (new_time >= 0) {
+      this.set_time = new_time;
+    }
+    this.active = true;
+    this.elapsed = 0;
+    this.printDebug("Timer started");
+  }
+
+  // Set count down to expired by setting start time in the past
+  expireCountDown() {
+    this.elapsed = this.set_time;
+    this.active = false;
+  }
+
+  // Returns time remaining note full accuracy - if need only seconds use math.floor
+  getTimeRemaining() {
+    // Set time - diff start and current time (as current time is bigger)
+    let current_time = this.set_time - this.elapsed;
+    this.printDebug("Time remaining: " + current_time);
+    if (current_time <= 0) {
+      return 0;
+    }
+    return current_time;
+  }
+
+  resetToDefault() {
+    this.startCountDown(this.default_time);
+    this.printDebug();
+  }
+
+  // Return the default (ie normal start time)
+  getDefaultTime() {
+    this.printDebug();
+    return this.default_time;
+  }
+
+  // Return the current start time
+  getSetTime() {
+    this.printDebug();
+    return this.set_time;
+  }
+
+  enableDebug() {
+    this.debug = true;
+  }
+
+  disableDebug() {
+    this.debug = false;
+  }
+
+  printDebug(extra = "") {
+    if (!this.debug) {
+      return;
+    }
+    console.log("Timer set = " + this.set_time + " Timer time = " + this.elapsed + " " + extra);
+  }
+
+  update(dt) {
+    if (this.active) {
+      this.elapsed += dt;
+    }
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
@@ -2359,7 +2450,7 @@ const HIGH_SCORE = new HighScore(GAME_CONTROLS);
  * Must implement show() display() mouse_move() and mouse_click() select()
  */
 const SUB_COMMANDS = new Map([
-  ['character', new CustomCharacter(GAME_CONTROLS, PLAYER_TEXT_IMG_FORMAT)],
+  ['character', new CustomCharacter(GAME_CONTROLS)],
   ['controls', new CustomControls(GAME_CONTROLS, WIDTH, HEIGHT)],
   ['highscore', HIGH_SCORE]
 ]);
@@ -2383,7 +2474,7 @@ function reset() {
   let [theme, theme_num] = SUB_COMMANDS.get('character').getTheme();
 
   // Player - baseed on PlayActor which inherits from Actor
-  player = new PlayerActor(theme, theme_num, player_img_format, WIDTH, HEIGHT);
+  player = new PlayerActor(theme, theme_num, '', WIDTH, HEIGHT);
 
   // Obstacles - these are actors, but stationary ones - default positions
   obstacles = [];
@@ -2464,6 +2555,10 @@ function draw() {
 }
 
 function update(dt) {
+  for (let timer of Timer.TIMERS) {
+    timer.update(dt);
+  }
+
   // Check for pause status if so only look for key press
   if (GAME_STATUS.isUserPause()) {
     // duck or jump to unpause (if want to use p button would need to add delay to prevent rapid toggling)
