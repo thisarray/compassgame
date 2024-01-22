@@ -2139,6 +2139,15 @@ def refreshSettings():
  */
 
 /*
+ * Return a random integer N such that min <= N < max.
+ */
+function getRandomInteger(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor((Math.random() * (max - min)) + min);
+}
+
+/*
  * Card is based on an Actor (uses inheritance)
  */
 class PlayerActor extends Actor {
@@ -2324,7 +2333,8 @@ class Timer {
   constructor(set_time, debug = false) {
     this.default_time = set_time;        // default_time is what we revert to when reset
     this.set_time = set_time;
-    this.active = false;
+    // Automatically start the timer on creation like the original
+    this.active = true;
     this.elapsed = 0;
     this.debug = debug;
     this.printDebug("Init");
@@ -2397,6 +2407,287 @@ class Timer {
     if (this.active) {
       this.elapsed += dt;
     }
+  }
+}
+
+/*
+ * Status is tracked as a number, but to make the code readable constants are used
+ * Note the actual number isn't important, but the order is as may use > or <
+ * Those with # * in the comments are used to determine higher state
+ */
+const STATUS_PRE_GAME = 0;             // * Used to delimit before game starts
+const STATUS_TITLE = 1;                // Title screen
+const STATUS_MENU_START = 10;          // * Used to delimit the menu
+const STATUS_MENU_END = 19;            // * End of Menu
+const STATUS_SUBCOMMAND = 21;
+const STATUS_NEW = 30;                 // * Game is ready to start, but not running
+const STATUS_PLAYER1_START = 31;
+const STATUS_END = 50;                 // * End of game reached
+const STATUS_SHOW_SCORE = 51;          // End message is displayed ready to restart
+
+// Number of actions to complete before moving up to the next level
+// Default = 30 (change for debugging)
+const NEXT_LEVEL_ACTIONS = 30;
+//const NEXT_LEVEL_ACTIONS = 5;
+
+// Number of seconds to display high score before allowing click to continue
+const TIME_DISPLAY_SCORE = 3;
+
+// Number of seconds when the timer starts
+const TIMER_START = 10.9;
+const PAUSE_TIME = 1.5;
+
+class GamePlay {
+  // user pause is pause waiting on user (eg. to click)
+  // Can be True (paused) or False (unpaused)
+  static USER_PAUSE = false;
+
+  // Must be initialized with a  game_timer timer (of Timer class) and dictionary with action_text instructions
+  constructor(action_text) {
+    // These are what we need to track
+    this.score = 0;
+    this.level = 0;
+
+    // This is the timer we use for counting down time
+    this.game_timer = new Timer(TIMER_START);
+    // Timer for game pauses
+    this.timer_pause = new Timer(PAUSE_TIME);
+
+    // Set a default target (but this will be updated when random direction generated)
+    this.target = 'south';
+
+    // Message to display when paused / level up etc.
+    this.game_message = "";
+    // Track number of actions caught within this level - used to determine decay and next level
+    this.level_actions_complete = 0;
+
+    this.status = STATUS_TITLE;
+
+    this.action_text = action_text;
+    // Set initial target move
+    this.getNextMove();
+  }
+
+  setShowScore() {
+    this.status = STATUS_SHOW_SCORE;
+    this.timer_pause.startCountDown();
+  }
+
+  isShowScore() {
+    if (this.status === STATUS_SHOW_SCORE) {
+      return true;
+    }
+    return false;
+  }
+
+  // Only returns true if STATUS_SHOW_SCORE and timer expired
+  isScoreShown() {
+    if ((this.status === STATUS_SHOW_SCORE) && (this.timer_pause.getTimeRemaining() <= 0)) {
+      return true;
+    }
+    return false;
+  }
+
+  // If game has not yet started
+  isNewGame() {
+    if (this.status === STATUS_NEW) {
+      return true;
+    }
+    return false;
+  }
+
+  isTitleScreen() {
+    if (this.status === STATUS_TITLE) {
+      return true;
+    }
+    return false;
+  }
+
+  isGameOver() {
+    if (this.status === STATUS_END) {
+      return true;
+    }
+    return false;
+  }
+
+  setGameOver() {
+    // Add short timer for game over to ensure
+    // player gets to see high score
+    this.game_timer.startCountDown(TIME_DISPLAY_SCORE);
+    this.status = STATUS_END;
+  }
+
+  isGameRunning() {
+    if ((this.status >= STATUS_PLAYER1_START) && (this.status < STATUS_END)) {
+      return true;
+    }
+    return false;
+  }
+
+  startNewGame() {
+    this.reset();
+    this.status = STATUS_NEW;
+    this.getNextMove();
+    // Resets and start the timer
+    this.game_timer.resetToDefault();
+    this.status = STATUS_PLAYER1_START;
+  }
+
+  // Point scored, so add score and get next move
+  // Update level if required then return level number
+  scorePoint() {
+    this.score += 1;
+    this.getNextMove();
+    this.level_actions_complete += 1;
+    // Update timer - subtracting timer decrement for each point scored
+    let timer_start = this.game_timer.getSetTime(),       // current timer start
+    // Timer update to extend a little due to difficulty
+        new_timer_time = timer_start + 2.5 - (timer_start * (this.level_actions_complete / (this.level_actions_complete + 10)));
+    // Don't want new timer to be larger than previous
+    if (new_timer_time > timer_start) {
+      new_timer_time = timer_start;
+    }
+    this.game_timer.startCountDown(new_timer_time);
+
+    // Check to see if the user has scored enough to move up a level
+    if (this.level_actions_complete >= NEXT_LEVEL_ACTIONS) {
+      this.game_timer.resetToDefault();
+      this.level += 1;
+      this.level_actions_complete = 0;
+    }
+    return this.level;
+  }
+
+  getScore() {
+    return this.score;
+  }
+
+  // Returns level number - or 0 if not in play
+  getLevel() {
+    if (this.isGameRunning()) {
+      return this.level;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  // Return status, unless not running
+  getStateString() {
+    if (this.isGameRunning()) {
+      return this.action_text.get(this.target);
+    }
+    else {
+      return "Not running";
+    }
+  }
+
+  getGameMessage() {
+    return this.game_message;
+  }
+
+  // If game paused normally then decrement
+  // If game 0 then return False - no longer paused
+  // Otherwise return True
+  isTimerPause() {
+    if (this.timer_pause.getTimeRemaining() > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  // Specifically looks if the user has paused (ie game_pause = -1)
+  isUserPause() {
+    return GamePlay.USER_PAUSE;
+  }
+
+  // Set pause to number of updates (approx 60 per second)
+  // Or set to 0 for no pause
+  // Don't use for user pause (as may change in future)
+  setTimerPause(time) {
+    this.timer_pause.startCountDown(time);
+  }
+
+  startTimerPause() {
+    this.timer_pause.startCountDown();
+  }
+
+  // Pause waiting on user - True = pause, False = not pause
+  setUserPause(status = true) {
+    this.game_pause = status;
+  }
+
+  getCurrentMove() {
+    return this.target;
+  }
+
+  // Update to next move and return
+  //Get next direction / jump / duck
+  getNextMove() {
+    let move_choices = ['north', 'south', 'east', 'west', 'jump', 'duck'];
+    this.target = move_choices[getRandomInteger(0, move_choices.length)];
+    return this.target;
+  }
+
+  setGameMessage(message) {
+    this.game_message = message;
+  }
+
+  getGameMessage() {
+    return this.game_message;
+  }
+
+  getTimeRemaining() {
+    return this.game_timer.getTimeRemaining();
+  }
+
+  setMenu(first_run = false) {
+    this.status = STATUS_MENU_START;
+    // If first run then don't use timer so can move cursor straight away
+    if (first_run) {
+      this.timer_pause.expireCountDown();
+    }
+    else {
+      this.timer_pause.startCountDown();
+    }
+  }
+
+  isMenu() {
+    if ((this.status >= STATUS_MENU_START) && (this.status <= STATUS_MENU_END)) {
+      return true;
+    }
+    return false;
+  }
+
+  setSubCommand(sub_command) {
+    this.sub_command = sub_command;
+    this.status = STATUS_SUBCOMMAND;
+  }
+
+  isSubCommand() {
+    if (this.status === STATUS_SUBCOMMAND) {
+      return true;
+    }
+    return false;
+  }
+
+  getSubCommand() {
+    if (this.status === STATUS_SUBCOMMAND) {
+      return this.sub_command;
+    }
+    return null;
+  }
+
+  // Gets the current status as a number - use for debugging only
+  getStatusNum() {
+    return this.status;
+  }
+
+  // Reset game to level
+  reset() {
+    this.level_actions_complete = 0;
+    this.score = 0;
+    this.level = 1;
   }
 }
 
