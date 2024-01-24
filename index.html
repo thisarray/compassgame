@@ -2691,6 +2691,86 @@ class GamePlay {
   }
 }
 
+/*
+ * Default keys provide a way to restore keys if they are corrupt
+ * either by deleting the config file, or from the command line
+ */
+const DEFAULT_KEYS = new Map([
+  ['escape', [keys.ESCAPE]],
+  ['jump', [keys.RETURN, keys.RSHIFT, keys.LCTRL]],
+  ['duck', [keys.SPACE, keys.LSHIFT]],
+  ['up', [keys.UP, keys.W]],
+  ['down', [keys.DOWN, keys.S]],
+  ['left', [keys.LEFT, keys.A]],
+  ['right', [keys.RIGHT, keys.D]],
+  ['pause', [keys.P]]
+]);
+
+//configured_keys
+
+/*
+ * Holds and stores the selected controls
+ * Works by having a method for each of the controls which tests if any selected
+ * Allows multiple key options for each key (eg. space and enter for jump / duck)
+ */
+class GameControls {
+  constructor() {
+    this.loadControls();
+  }
+
+  // Controls (if it exists) is a pickle file
+  loadControls() {
+    this.configured_keys = new Map();
+    for (const [key, value] of DEFAULT_KEYS) {
+      this.configured_keys.set(key, value);
+    }
+  }
+
+  // Replaces current file with configured_keys
+  saveControls() {
+    console.log("Save custom controls failed");
+  }
+
+  // Returns True if the key is pressed, else false
+  isPressed(keyboard, key) {
+    for (let this_key of this.configured_keys.get(key)) {
+      if (keyboard[this_key]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Same as isPressed, but can test for multiple keys
+  // keys must be array
+  isOrPressed(keyboard, keys) {
+    for (let key of keys) {
+      for (let this_key of this.configured_keys.get(key)) {
+        if (keyboard[this_key]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  getKeys() {
+    return this.configured_keys.keys();
+  }
+
+  getKeyString(index) {
+    let return_string = "";
+    for (let this_entry of this.configured_keys.get(index)) {
+      return_string += this_entry + " ";
+    }
+    return return_string;
+  }
+
+  setKey(key, keycode) {
+    this.configured_keys.set(key, [keycode]);
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
