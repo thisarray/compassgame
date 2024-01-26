@@ -3030,6 +3030,48 @@ class HighScore {
   }
 }
 
+/*
+ * Used by GameMenu
+ */
+class MenuItem {
+  // Text is the text label to show to the user
+  // command is instruction to run or label of submenu (eg. 'instructions')
+  // menu_type is what kind of entry it is eg. 'submenu', 'command'(return string), 'textpage' or 'subcommand' (command run within the menu)
+  constructor(text, command, menu_type) {
+    this.page = '';
+
+    this.text = text;
+    this.command = command;
+    this.menu_type = menu_type;
+  }
+
+  getText() {
+    return this.text;
+  }
+
+  getCommand() {
+    return this.command;
+  }
+
+  getMenuType() {
+    return this.menu_type;
+  }
+
+  setPage(text) {
+    this.page = text;
+  }
+
+  // Only available for textpage
+  getPage() {
+    if (this.menu_type !== 'textpage') {
+      return "";
+    }
+    else {
+      return this.page;
+    }
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
