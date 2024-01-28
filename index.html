@@ -3297,6 +3297,99 @@ class GameMenu {
   }
 }
 
+/*
+ * Loads and provides information on the theme
+ */
+class ThemeDetails {
+
+  // don't change default colours - they belong to the theme
+  // instead update current_colours
+
+  constructor() {
+    this.theme_loaded = false;
+  }
+
+  // Loads colour config file for person
+  loadConfig(theme) {
+    this.theme = theme;
+
+    // Reset all these entries to prevent loading alongside existing
+    // Keys is a list so it is indexed
+    this.keys = [];
+    this.about = new Map();
+    this.default_colours = new Map();
+    this.labels = new Map();
+    // colour options is an dictionary with array of tuples
+    this.colour_options = new Map();
+
+    this.custom_colours = new Map();
+    for (const [key, colour] of this.default_colours) {
+      this.setColour(key, colour);
+    }
+
+    // Simple check - if we haven't raised an exception then theme loaded
+    // Doesn't check number of entries
+    this.theme_loaded = false;
+  }
+
+  // Return all the CustomColours
+  getCustomColours() {
+    return this.custom_colours;
+  }
+
+  isThemeLoaded() {
+    return this.theme_loaded;
+  }
+
+  getTheme() {
+    return this.theme;
+  }
+
+  // Returns dict of short label = full string
+  getLabels() {
+    return this.labels;
+  }
+
+  getDefaultColour(key) {
+    return this.default_colours.get(key);
+  }
+
+  // uses custom colours
+  getColour(key) {
+    return this.custom_colours.get(key);
+  }
+
+  setColour(key, colour) {
+    this.custom_colours.set(key, colour);
+  }
+
+  getKeys() {
+    return this.keys;
+  }
+
+  numKeys() {
+    return this.keys.length;
+  }
+
+  // This should be the same for any, but no guarentee in future so allows key
+  numColourOptions(key = 'default') {
+    return this.colour_options.get(key).length;
+  }
+
+  getLabel(key) {
+    return this.labels.get(key);
+  }
+
+  getColourOptions(key) {
+    if (this.colour_options.has(key)) {
+      return this.colour_options.get(key);
+    }
+    else {
+      return this.colour_options.get('default');
+    }
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
