@@ -3390,6 +3390,475 @@ class ThemeDetails {
   }
 }
 
+// Track state for the display
+// 'main' is the main page, 'custom' is used to choose custom colours, 'clicked' used to handle mouse click
+const STATUS_MAIN = 0;
+const STATUS_CUSTOM = 2;
+const STATUS_PROGRESS = 3;
+
+class CustomCharacter {
+  static BACKGROUND_IMG = "background_settings_01";
+
+  static CURRENT_ACTOR_YPOS = 220;
+  static CUSTOM_ACTOR_YPOS = 460;
+
+  constructor(game_controls) {
+    // Load default image for each actor to allow character selection
+    this.current_theme_actors = [];
+    this.available_theme_actors = [];
+
+    this.current_themes = [];    // Stores tuple with theme and variation number - eg. (person1,2)
+    this.available_themes = [];
+
+    // Are we on top row (0 = current_characters) or bottom row (1 = customize characters)
+    this.selected_row = 0;
+    // position of selection on the x axis
+    this.selected_col = 0;
+
+    // Which row is selected when creating a custom entry
+    this.selected_row_custom = 0;
+    // which colour col pos is selected (-1 = none)
+    this.selected_colour_custom = -1;
+
+    // Default theme must be valid
+    this.theme = "person1";
+    this.theme_num = 0;
+
+    // Class to hold details of theme from config file
+    this.theme_config = new ThemeDetails();
+
+    // Track which character is shown on the left most position
+    this.char_left_pos = 0;
+
+
+    this.status = STATUS_MAIN;
+
+    this.game_controls = game_controls;
+    // Create a regular expression to identify themes
+    // does not use \w as do not include _ character
+    // Look for image 0 (down 1) - other variants of the first number part is different colours
+    // Timer restrict keyboard movements to fraction of second to prevent multiple presses
+    this.pause_timer = new Timer(0.12);
+    this.loadPreviews();
+    this.loadThemes();
+  }
+
+  // Themes only need to be loaded once - they don't change except by downloading and installing
+  loadThemes() {
+    // Load the themes - only look in the SVG folder
+  }
+
+  // Previews are the current variations of the themes, these may be reloaded when a new custom character is created
+  loadPreviews() {
+    // Reset values from previous load
+/*
+    this.current_themes = [["person1", 0], ["person2", 0]];
+    this.current_theme_actors = [];
+
+    // Load the different variations on the themes currently available
+    let xpos = 100,
+        actor;
+    for (let [theme, theme_num] of this.current_themes) {
+      actor = new Actor(PlayerActor.getImage(theme, theme_num, "down", 1));
+      actor.pos = [xpos, CustomCharacter.CURRENT_ACTOR_YPOS];
+      this.current_theme_actors.push(actor);
+      xpos += 100;
+    }
+*/
+    this.current_themes = [];
+    this.current_theme_actors = [];
+  }
+
+  draw(screen) {
+    if (this.status === STATUS_MAIN) {
+      this.drawMain(screen);
+    }
+    else if (this.status === STATUS_CUSTOM) {
+      this.drawCustom(screen);
+    }
+  }
+
+  drawCustom(screen) {
+    screen.blit(CustomCharacter.BACKGROUND_IMG, [0, 0]);
+    screen.draw.text('Customize Character', {
+      fontsize: 60,
+      center: [400, 50],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+    if (!this.theme_config.isThemeLoaded) {
+      screen.draw.text('No config found for this theme, please choose a different theme', {
+        fontsize: 40,
+        topleft: [100, 150],
+        color: [255, 0, 0]
+      });
+      return;
+    }
+    let ypos = 100,
+        list_keys = this.theme_config.getKey(),
+        key;
+    for (let i = 0; i < list_keys.length; i++) {
+      key = list_keys[i];
+      screen.draw.text(this.theme_config.getLabel(key), {
+        fontsize: 30,
+        topleft: [100, ypos],
+        color: [0, 0, 0]
+      });
+      if (i === this.selected_row_custom) {
+        if (this.selected_colour_custom === -1) {
+          this.drawColourBox(screen, true, this.theme_config.getColour(key), 300, ypos);
+        }
+        else {
+          this.drawColourBox(screen, false, this.theme_config.getColour(key), 300, ypos);
+        }
+        // If a row selected then show colour options
+        this.showColourOptions(screen, key, 350, ypos);
+      }
+      else {
+        this.drawColourBox(screen, false, this.theme_config.getColour(key), 300, ypos);
+      }
+      ypos += 50;
+    }
+    // Add OK / Cancel buttons
+    if ((this.selected_row_custom === this.theme_config.numKeys()) && (this.selected_colour_custom === -1)) {
+      screen.draw.text('Save', {
+        fontsize: 30,
+        center: [150, 500],
+        color: [255, 255, 255]
+      });
+    }
+    else {
+      screen.draw.text('Save', {
+        fontsize: 30,
+        center: [150, 500],
+        color: [0, 0, 0]
+      });
+    }
+    if ((this.selected_row_custom === this.theme_config.numKeys()) && (this.selected_colour_custom > -1)) {
+      screen.draw.text('Cancel', {
+        fontsize: 30,
+        center: [300, 500],
+        color: [255, 255, 255]
+      });
+    }
+    else {
+      screen.draw.text('Cancel', {
+        fontsize: 30,
+        center: [300, 500],
+        color: [0, 0, 0]
+      });
+    }
+    this.preview.draw();
+  }
+
+  // Draws box, if selected = True includes highlight
+  // x, y pos is the box without highlighting - with highligting it will be -2 from that value
+  drawColourBox(screen, selected, colour, xpos, ypos) {
+    if (selected) {
+      // If cursor is on this position (-1) then highlight current colour
+      // Higlight with black and white so it will contrast with either colour
+      screen.draw.filled_rect(new Rect([xpos, ypos], [24, 24]), [0, 0, 0]);
+      screen.draw.filled_rect(new Rect([xpos - 2, ypos - 2], [24, 24]), [255, 255, 255]);
+    }
+    screen.draw.filled_rect(new Rect([xpos, ypos], [20, 20]), colour);
+  }
+
+  // Shows the available colours - part is what part of body / clothing
+  showColourOptions(screen, part, xpos, ypos) {
+    let colour_options = this.theme_config.getColourOptions(part);
+    for (let i = 0; i < colour_options.length; i++) {
+      if (i === this.selected_colour_custom) {
+        this.drawColourBox(screen, true, colour_options[i], xpos + (25 * i), ypos);
+      }
+      else {
+        this.drawColourBox(screen, false, colour_options[i], xpos + (25 * i), ypos);
+      }
+    }
+  }
+
+  drawMain(screen) {
+    screen.blit(CustomCharacter.BACKGROUND_IMG, [0, 0]);
+
+    // Draw a box around the current character
+    // Get a rect same pos as character
+    // Done first so that it can be filled to make lines thicker
+    let highlight_rect;
+    if (this.selected_row === 0) {
+      highlight_rect = new Rect(this.current_theme_actors[this.selected_col]);
+    }
+    else if (this.selected_row === 1) {
+      highlight_rect = new Rect(this.available_theme_actors[this.selected_col]);
+    }
+    highlight_rect.inflate_ip(6, 6);
+    screen.draw.filled_rect(highlight_rect, [255, 255, 255]);
+
+    screen.draw.text('Custom Character', {
+      fontsize: 60,
+      center: [400, 50],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+
+    screen.draw.text('Existing Character', {
+      fontsize: 40,
+      center: [400, 120],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+    this.drawCustomChars();
+
+    screen.draw.text('Customize Character', {
+      fontsize: 40,
+      center: [400, 340],
+      shadow: [1, 1],
+      color: [255, 255, 255],
+      scolor: "#202020"
+    });
+    for (let actor of this.available_theme_actors) {
+      actor.draw();
+    }
+  }
+
+  // Draws the custom chars
+  // First updates each of the actors with their current location then calls
+  // draw
+  drawCustomChars() {
+    let xpos = 100;
+    for (let i = this.char_left_pos; i < (this.char_left_pos + 7); i++) {
+      if (i >= this.current_theme_actors.length) {
+        break;
+      }
+      this.current_theme_actors[i].posx = xpos;
+      this.current_theme_actors[i].draw();
+      xpos += 100;
+    }
+  }
+
+  update(keyboard) {
+    if (this.pause_timer.getTimeRemaining() > 0) {
+      return;
+    }
+    // Control main screen
+    if (this.status === STATUS_MAIN) {
+      // returns whatever updateMain returns - None if still in selection or menu if theme updated
+      return this.updateMain(keyboard);
+    }
+    else if (this.status === STATUS_CUSTOM) {
+      this.status = this.updateCustom(keyboard);
+      if (this.status === STATUS_MAIN) {
+        this.pause_timer.startCountDown();
+      }
+      return;
+    }
+    // If mouse clicked
+    else if (this.status === STATUS_CLICKED) {
+      this.status = STATUS_MAIN;
+      if (this.selected_row === 0) {
+        let [theme, theme_num] = this.current_themes[this.selected_col];
+        this.theme = theme;
+        this.theme_num = theme_num;
+      }
+      return 'menu';
+    }
+    else if (this.status === STATUS_PROGRESS) {
+      // Reload the custom screen
+      this.loadPreviews();
+      this.status = STATUS_MAIN;
+    }
+    else {
+      return;
+    }
+  }
+
+  // Update on customize screen
+  updateCustom(keyboard) {
+    this.pause_timer.startCountDown();
+    if (keyboard[keys.DOWN]) {
+      this.selected_row_custom += 1;
+      // If already on bottom row (Cancel / OK Button) then stay there and return
+      if (this.selected_row_custom > this.theme_config.numKeys()) {
+        this.selected_row_custom = this.theme_config.numKeys();
+        return STATUS_CUSTOM;
+      }
+      // Whenever moving up or down reset to the current colour position  (or OK button for bottom row)
+      this.selected_colour_custom = -1;
+      // Row after colours is Cancel / OK button
+      if (this.selected_row_custom >= this.theme_config.numKeys()) {
+        this.selected_row_custom = this.theme_config.numKeys();
+      }
+    }
+    if (this.game_controls.isPressed(keyboard, 'up')) {
+      this.selected_row_custom -= 1;
+      // Whenever moving up or down reset to the current colour position
+      this.selected_colour_custom = -1;
+      // Row after colours is Cancel / OK button
+      if (this.selected_row_custom < 0) {
+        this.selected_row_custom = 0;
+      }
+    }
+    if (this.game_controls.isPressed(keyboard, 'left')) {
+      this.selected_row_custom -= 1;
+      if (this.selected_colour_custom < -1) {
+        this.selected_colour_custom = -1;
+      }
+    }
+    if (this.game_controls.isPressed(keyboard, 'right')) {
+      // Reuse the colour for use by the Cancel button
+      if (this.selected_row_custom > this.theme_config.numKeys()) {
+        this.selected_colour_customer = 0;
+        return STATUS_CUSTOM;
+      }
+      this.selected_colour_custom += 1;
+      if (this.selected_colour_custom > (this.theme_config.numColourOptions() - 1)) {
+        this.selected_colour_custom = this.theme_config.numColourOptions() - 1;
+      }
+    }
+    if (this.game_controls.isOrPressed(keyboard, ['jump', 'duck'])) {
+      if (this.selected_row_custom < this.theme_config.numKeys()) {
+        let all_keys = this.theme_config.getKeys(),
+            this_key = all_keys[this.selected_row_custom],
+            colour_options = this.theme_config.getColourOptions(this_key);
+        // update with the selected colour
+        this.theme_config.setColour(this_key, colour_options[this.selected_colour_custom]);
+        return STATUS_CUSTOM;
+      }
+      // Here if it's a select on bottom row = Save or Cancel
+      // Cancel button selected
+      else if (this.selected_colour_custom > -1) {
+        return STATUS_MAIN;
+      }
+      else {
+        console.log("Unable to find next number for save file");
+        return STATUS_MAIN;
+      }
+    }
+    else {
+      return STATUS_CUSTOM;
+    }
+  }
+
+  // Update main screen
+  updateMain(keyboard) {
+    if (this.game_controls.isPressed(keyboard, 'up')) {
+      this.selected_row = 0;
+      this.selected_col = this.checkColPos(this.selected_col, this.selected_row);
+    }
+    if (this.game_controls.isPressed(keyboard, 'down')) {
+      this.selected_row = 1;
+      this.selected_col = this.checkColPos(this.selected_col, this.selected_row);
+    }
+    if (this.game_controls.isPressed(keyboard, 'right')) {
+      this.selected_col = this.checkColPos(this.selected_col + 1, this.selected_row);
+    }
+    if (this.game_controls.isPressed(keyboard, 'left')) {
+      this.selected_col = this.checkColPos(this.selected_col - 1, this.selected_row);
+    }
+    if (this.game_controls.isOrPressed(keyboard, ['jump', 'duck'])) {
+      // If pressed on top row then update theme
+      if (this.selected_row === 0) {
+        let [theme, theme_num] = this.current_themes[this.selected_col];
+        this.theme = theme;
+        this.theme_num = theme_num;
+      }
+      // If pressed on second row then customize theme
+      else if (this.selected_row === 1) {
+        // Reset position
+        this.selected_row_custom = 0;
+        this.selected_colour_custom = -1;
+
+        this.customize_theme = this.available_themes[this.selected_col];
+        this.status = STATUS_CUSTOM;
+        this.preview = new Actor(PlayerActor.getImage(this.customize_theme, 0, "down", 1));
+        this.preview.pos = [700, 150];
+        this.theme_config.loadConfig(this.customize_theme);
+        this.pause_timer.startCountDown();
+        return 'character';
+      }
+      return 'menu';
+    }
+    this.pause_timer.startCountDown();
+  }
+
+  // Checks to see if col is too far left or right and returns nearest safe pos
+  checkColPos(col_pos, row_pos) {
+    // Too far left is same either case return 0
+    if (col_pos < 0) {
+      return 0;
+    }
+    // Top row
+    if (row_pos === 0) {
+      if (col_pos >= this.current_themes.length) {
+        return (this.current_themes.length - 1);
+      }
+      else if ((col_pos >= (this.char_left_pos + 7)) && (this.char_left_pos < (this.current_themes.length - 6))) {
+        this.char_left_pos += 1;
+      }
+      else if ((col_pos <= this.char_left_pos) && (this.char_left_pos > 0)) {
+        this.char_left_pos -= 1;
+      }
+    }
+    else if (row_pos === 1) {
+      if (col_pos >= this.available_themes.length) {
+        return (this.available_themes.length - 1);
+      }
+    }
+    return col_pos;
+  }
+
+  mouse_move(pos) {
+  }
+
+  mouse_click(pos) {
+    if (this.pause_timer.getTimeRemaining() > 0) {
+      return;
+    }
+    this.pause_timer.startCountDown();
+    if (this.status === STATUS_MAIN) {
+      // cycle through different images checking for collision
+      for (let i = 0; i < this.current_theme_actors.length; i++) {
+        if (this.current_theme_actors[i].collidepoint(pos)) {
+          this.selected_row = 0;
+          this.selected_col = i;
+          this.status = STATUS_CLICKED;
+          return;
+        }
+      }
+      for (let i = 0; i < this.available_theme_actors.length; i++) {
+        if (this.available_theme_actors[i].collidepoint(pos)) {
+          this.selected_row = 1;
+          this.selected_col = i;
+          this.status = STATUS_CLICKED;
+          return;
+        }
+      }
+    }
+  }
+
+  select() {
+    this.pause_timer.startCountDown();
+  }
+
+  getTheme() {
+    return [this.theme, this.theme_num];
+  }
+
+  // Get next available number for this theme
+  // Iterates through permutations of files looking for next one that doesn't exist
+  findNextNumber(theme) {
+    return 0;
+  }
+
+  // Create SVG based on original, creating new file
+  // Uses self.theme_config to get details of what colours need to be mapped to new colours
+  createSVG(original_file, new_file) {
+    console.log("Error creating new config file");
+    return false;
+  }
+}
+
 WIDTH = 800;
 HEIGHT = 600;
 TITLE = "Compass Game";
