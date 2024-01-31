@@ -3280,7 +3280,6 @@ class GameMenu {
     this.status = STATUS_MENU;
   }
 
-
   // Checks if mouse is over menu and if so returns menu position
   // Otherwise returns -1
   get_mouse_menu_pos(pos) {
@@ -3856,6 +3855,213 @@ class CustomCharacter {
   createSVG(original_file, new_file) {
     console.log("Error creating new config file");
     return false;
+  }
+}
+
+/*
+ * Handles Custom Controller Menu
+ * Status values
+ */
+const STATUS_CUSTOM_KEY = 2;
+
+class CustomControls {
+  static MENU_SPACING = 35; // distance between menu items
+  static TOP_SPACING = 20;  // distance between top of menu and start of menu
+  static LEFT_SPACING = 20; // distance between left and text for page text / command text
+  static MENU_FONT_SIZE = 32;   // size of font for menu items
+
+  // Requires width and height - these can be the same as the screen or smaller if need to constrain menu
+  // Offset and border determine distance from origin of screen and any fixed area to avoid respectively
+  constructor(game_controls, width = 800, height = 600, offset = null, border = 100) {
+    if (!Array.isArray(offset)) {
+      offset = [0, 0];
+    }
+    this.status = STATUS_MENU;         // Track whether to display menu or in menu etc.
+
+    this.game_controls = game_controls;
+    this.width = width;              // width of screen
+    this.height = height;            // height of screen
+    this.offset = offset;            // tuple x,y for offset from start of screen
+    this.border = border;            // single value same for x and y
+    // Start position of the menu area and size
+    this.start_pos = [this.offset[0] + this.border, this.offset[1] + this.border];
+    this.size = [this.width - (2 * this.start_pos[0]), this.height - (2 * this.start_pos[1])];
+
+    // Position of rect is 0,0 relative to the surface, not the screen
+    this.menu_box = new Rect(this.start_pos, this.size);
+    this.menu_pos = 0;       // Tracks which menu item is selected
+
+
+    // Timer restrict keyboard movements to prevent multiple presses
+    this.menu_timer = new Timer(0.12);
+
+    this.updateMenuItems();
+  }
+
+  // Updates the menu items - run this whenever the menu changes
+  updateMenuItems() {
+    this.menu_items = [];
+    // Store keys in an array to fix order and make easier to identify selected key
+    for (let this_key of this.game_controls.getKeys()) {
+      this.menu_items.push(new MenuItem(this_key + " (" + this.game_controls.getKeyString(this_key) + ")", this_key, 'control'));
+    }
+
+    // Dummy entry - blank line
+    this.menu_items.push(new MenuItem("", "", "controls"));
+    // Last Menu item is to save and return
+    this.menu_items.push(new MenuItem("Save settings", 'save', 'menu'));
+  }
+
+  // Update menu based on keyboard direction
+  // If return is 'controls' then still in custon controls, so don't update anything else
+  // If return is 'menu' then return to main game menu
+  update(keyboard) {
+    // Handle erquest for new key
+    if ((this.status === STATUS_CUSTOM_KEY) && (this.menu_timer.getTimeRemaining() <= 0)) {
+      let keycode = this.checkKey(keyboard);
+      if (keycode !== null) {
+        this.game_controls.setKey(this.selected_key, keycode);
+        this.menu_timer.startCountDown();
+        this.status = STATUS_MENU;
+      }
+      this.updateMenuItems();
+      return 'controls';
+    }
+    // check if status is clicked - which means mouse was pressed on a valid entry
+    if (this.status === STATUS_CLICKED) {
+      this.selected_key = this.menu_items[this.menu_pos].getCommand();
+      this.reset();
+      this.status = STATUS_CUSTOM_KEY;
+    }
+    // check if we are in menu timer in which case return until expired
+    else if (this.menu_timer.getTimeRemaining() > 0) {
+      return 'controls';
+    }
+    else if (this.game_controls.isPressed(keyboard, 'up') && (this.menu_pos > 0)) {
+      if (this.status === STATUS_MENU) {
+        this.menu_pos -= 1;
+        this.menu_timer.startCountDown();
+      }
+    }
+    else if (this.game_controls.isPressed(keyboard, 'down') && (this.menu_pos < (this.menu_items.length - 1))) {
+      if (this.status === STATUS_MENU) {
+        this.menu_pos += 1;
+        this.menu_timer.startCountDown();
+      }
+    }
+    else if (this.game_controls.isOrPressed(keyboard, ['jump', 'duck'])) {
+      if (this.status === STATUS_MENU) {
+        this.selected_key = this.menu_items[this.menu_pos].getCommand();
+        this.reset();
+        // special case where selected_key is the save option
+        if (this.selected_key === 'save') {
+          // Save the controls
+          this.game_controls.saveControls();
+          return 'menu';
+        }
+        // Another special case - blank entry used as a spacer
+        // Ignore and continue with custom controls menu
+        else if (this.selected_key === '') {
+          this.menu_timer.startCountDown();
+          return 'controls';
+        }
+        this.status = STATUS_CUSTOM_KEY;
+      }
+    }
+    else if (this.game_controls.isPressed(keyboard, 'escape')) {
+      return 'menu';
+    }
+    return 'controls';
+  }
+
+  // Checks pygame event queue for last key pressed
+  checkKey(keyboard) {
+    return null;
+  }
+
+  draw(screen) {
+    // Create a menu surface - this involves using pygame surface feature (rather than through pygame zero)
+    // Allows for more advanced features such as alpha adjustment (partial transparency)
+    // 75% opacity
+    // Create a rectangle across the area - provides transparancy
+    screen.draw.filled_rect(this.menu_box, [200, 200, 200, 192]);
+    // draw directly onto the screen draw surface (transparency doesn't apply)
+    if (this.status === STATUS_MENU) {
+      this.drawMenu(screen);
+    }
+    else if (this.status === STATUS_CUSTOM_KEY) {
+      this.drawCustom(screen);
+    }
+  }
+
+  drawCustom(screen) {
+    screen.draw.text("Press custom key for " + this.selected_key, {
+      fontsize: CustomControls.MENU_FONT_SIZE,
+      midtop: [this.width / 2, this.offset[1] + this.border + CustomControls.MENU_SPACING + CustomControls.TOP_SPACING],
+      color: [0, 0, 0]
+    });
+  }
+
+  drawMenu(screen) {
+    for (let menu_num = 0; menu_num < this.menu_items.length; menu_num++) {
+      let color = [0, 0, 0];
+      if (menu_num === this.menu_pos) {
+        color = [255, 255, 255];
+      }
+      screen.draw.text(this.menu_items[menu_num].getText(), {
+        fontsize: CustomControls.MENU_FONT_SIZE,
+        midtop: [this.width / 2, this.offset[1] + this.border + (CustomControls.MENU_SPACING * menu_num) + CustomControls.TOP_SPACING],
+        color: color
+      });
+    }
+  }
+
+  mouse_move(pos) {
+    if (this.status === STATUS_MENU) {
+      let return_val = this.get_mouse_menu_pos(pos);
+      if (return_val !== -1) {
+        this.menu_pos = return_val;
+      }
+    }
+  }
+
+  mouse_click(pos) {
+    if (this.status === STATUS_MENU) {
+      let return_val = this.get_mouse_menu_pos(pos);
+      if (return_val !== -1) {
+        this.menu_pos = return_val;
+        this.status = STATUS_CLICKED;
+      }
+    }
+    // If click from text page then return to menu
+    else if (this.status === STATUS_PAGE) {
+      this.status = STATUS_MENU;
+    }
+  }
+
+  select() {
+    this.menu_timer.startCountDown();
+  }
+
+  reset() {
+    this.menu_timer.startCountDown();
+    this.menu_pos = 0;
+    this.status = STATUS_MENU;
+  }
+
+  // Checks if mouse is over menu and if so returns menu position
+  // Otherwise returns -1
+  get_mouse_menu_pos(pos) {
+    if ((pos[0] > this.start_pos[0]) && (pos[1] > (this.start_pos[1] + CustomControls.TOP_SPACING)) && (pos[0] < (this.start_pos[0] + this.size[0])) && (pos[1] < (this.start_pos[1] + this.size[1]))) {
+      let start_y = this.start_pos[1] + CustomControls.TOP_SPACING;
+      for (let this_menu_pos = 0; this_menu_pos < this.menu_items.length; this_menu_pos++) {
+        if (((pos[1] - start_y) >= (this_menu_pos * CustomControls.MENU_SPACING)) && ((pos[1] - start_y) <= ((this_menu_pos * CustomControls.MENU_SPACING) + CustomControls.MENU_SPACING))) {
+          return this_menu_pos;
+        }
+      }
+    }
+    // If not returned then not over menu
+    return -1;
   }
 }
 
