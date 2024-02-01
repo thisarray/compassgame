@@ -4096,31 +4096,6 @@ const ACTION_TEXT = new Map([
 ]);
 
 /*
- * Track Status etc
- */
-const GAME_STATUS = new GamePlay(ACTION_TEXT);
-
-/*
- * Handles key interaction
- */
-const GAME_CONTROLS = new GameControls();
-
-/*
- * Track high score
- */
-const HIGH_SCORE = new HighScore(GAME_CONTROLS);
-
-/*
- * These are used for the menu sub commands - must be classes
- * Must implement show() display() mouse_move() and mouse_click() select()
- */
-const SUB_COMMANDS = new Map([
-  ['character', new CustomCharacter(GAME_CONTROLS)],
-  ['controls', new CustomControls(GAME_CONTROLS, WIDTH, HEIGHT)],
-  ['highscore', HIGH_SCORE]
-]);
-
-/*
  * Positions to place obstacles Tuples: (x,y)
  */
 const OBSTACLE_POSITIONS = [[200, 200], [400, 400], [500, 500], [80, 120], [700, 150], [750, 540], [200, 550], [60, 320], [730, 290], [390, 170], [420, 500]];
@@ -4132,11 +4107,27 @@ const EAST_BOX = new Rect([WIDTH - BOX_SIZE, 0], [WIDTH, HEIGHT]);
 const SOUTH_BOX = new Rect([0, HEIGHT - BOX_SIZE], [WIDTH, HEIGHT]);
 const WEST_BOX = new Rect([0, 0], [BOX_SIZE, HEIGHT]);
 
-let player, obstacles, menu;
+let game_status, game_controls, high_score, sub_commands, player, obstacles, menu;
 
 function reset() {
+  // Track Status etc
+  game_status = new GamePlay(ACTION_TEXT);
+  // Handles key interaction
+  game_controls = new GameControls();
+
+  // Track high score
+  high_score = new HighScore(game_controls);
+
+  // These are used for the menu sub commands - must be classes
+  // Must implement show() display() mouse_move() and mouse_click() select()
+  sub_commands = new Map([
+    ['character', new CustomCharacter(game_controls)],
+    ['controls', new CustomControls(game_controls, WIDTH, HEIGHT)],
+    ['highscore', high_score]
+  ]);
+
   // allows different character looks - must come after the sub_commands are defined
-  let [theme, theme_num] = SUB_COMMANDS.get('character').getTheme();
+  let [theme, theme_num] = sub_commands.get('character').getTheme();
 
   // Player - baseed on PlayActor which inherits from Actor
   player = new PlayerActor(theme, theme_num, '', WIDTH, HEIGHT);
@@ -4144,38 +4135,38 @@ function reset() {
   // Obstacles - these are actors, but stationary ones - default positions
   obstacles = [];
 
-  menu = new GameMenu(GAME_CONTROLS, WIDTH, HEIGHT);
+  menu = new GameMenu(game_controls, WIDTH, HEIGHT);
 }
 
 function draw() {
   // Check for sub command first as they use own background image
-  if (GAME_STATUS.isSubCommand()) {
-    SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).draw(screen);
+  if (game_status.isSubCommand()) {
+    sub_commands.get(game_status.getSubCommand()).draw(screen);
     return;
   }
 
   // Draw background
-  screen.blit(get_background_img(GAME_STATUS.getLevel()), [0, 0]);
+  screen.blit(get_background_img(game_status.getLevel()), [0, 0]);
 
-  if (GAME_STATUS.isGameOver() || GAME_STATUS.isShowScore()) {
-    screen.draw.text("Game Over\nScore " + GAME_STATUS.getScore(), {
+  if (game_status.isGameOver() || game_status.isShowScore()) {
+    screen.draw.text("Game Over\nScore " + game_status.getScore(), {
       fontsize: 60,
       center: [WIDTH / 2, 200],
       color: [89, 6, 13]
     });
-    HIGH_SCORE.showScores(screen, [200, 270]);
+    high_score.showScores(screen, [200, 270]);
   }
-  if (GAME_STATUS.isMenu()) {
+  if (game_status.isMenu()) {
     menu.show(screen);
   }
-  else if (GAME_STATUS.isTitleScreen()) {
+  else if (game_status.isTitleScreen()) {
     // If want anything on title screen insert here
     // Must exist with pass if nothing else
   }
-  else if (GAME_STATUS.isShowScore()) {
+  else if (game_status.isShowScore()) {
   }
   else {
-    let time_remaining_secs = Math.floor(GAME_STATUS.getTimeRemaining());
+    let time_remaining_secs = Math.floor(game_status.getTimeRemaining());
     screen.draw.text('Time: ' + time_remaining_secs, {
       fontsize: 60,
       center: [100, 50],
@@ -4183,7 +4174,7 @@ function draw() {
       color: [255, 255, 255],
       scolor: "#202020"
     });
-    screen.draw.text('Score ' + GAME_STATUS.getScore(), {
+    screen.draw.text('Score ' + game_status.getScore(), {
       fontsize: 60,
       center: [WIDTH - 130, 50],
       shadow: [1, 1],
@@ -4191,8 +4182,8 @@ function draw() {
       scolor: "#202020"
     });
     // Only show state if not timer paused
-    if (!GAME_STATUS.isTimerPause()) {
-      screen.draw.text(GAME_STATUS.getStateString(), {
+    if (!game_status.isTimerPause()) {
+      screen.draw.text(game_status.getStateString(), {
         fontsize: 60,
         center: [WIDTH / 2, 50],
         shadow: [1, 1],
@@ -4207,8 +4198,8 @@ function draw() {
     }
 
     // If want a message over the top of the screen then add here (eg. pause / level up)
-    if (GAME_STATUS.getGameMessage() !== "") {
-      screen.draw.text(GAME_STATUS.getGameMessage(), {
+    if (game_status.getGameMessage() !== "") {
+      screen.draw.text(game_status.getGameMessage(), {
         fontsize: 60,
         center: [WIDTH / 2, HEIGHT / 2],
         shadow: [1, 1],
@@ -4225,53 +4216,53 @@ function update(dt) {
   }
 
   // Check for pause status if so only look for key press
-  if (GAME_STATUS.isUserPause()) {
+  if (game_status.isUserPause()) {
     // duck or jump to unpause (if want to use p button would need to add delay to prevent rapid toggling)
-    if (GAME_CONTROLS.isOrPressed(keyboard, ['jump', 'duck'])) {
-      GAME_STATUS.setUserPause(false);
+    if (game_controls.isOrPressed(keyboard, ['jump', 'duck'])) {
+      game_status.setUserPause(false);
     }
     else {
       return;
     }
   }
   // Check for timer pause - if so return until expired
-  if (GAME_STATUS.isTimerPause()) {
+  if (game_status.isTimerPause()) {
     return;
   }
   // Reset message after timer finished
-  GAME_STATUS.setGameMessage("");
+  game_status.setGameMessage("");
 
-  if (GAME_STATUS.isTitleScreen()) {
+  if (game_status.isTitleScreen()) {
     // first_run prevents timer
-    GAME_STATUS.setMenu(true);
+    game_status.setMenu(true);
   }
 
 
   // Call menu update function, if return is not 0 then continue with rest of updates
   // If return is 0 then still in menu, so don't update anything else
   // If negative then quit the application
-  if (GAME_STATUS.isMenu()) {
+  if (game_status.isMenu()) {
     let result = menu.update(keyboard);
     if (result === 'menu') {
       // Still in menu (displayed through show())
       return;
     }
     else if (result === 'start') {
-      GAME_STATUS.startNewGame();
+      game_status.startNewGame();
     }
     // Otherwise likely to be subcommand
-    else if (SUB_COMMANDS.has(result)) {
-      GAME_STATUS.setSubCommand(result);
+    else if (sub_commands.has(result)) {
+      game_status.setSubCommand(result);
       // Starts the timer
-      SUB_COMMANDS.get(result).select();
+      sub_commands.get(result).select();
     }
   }
 
 
-  if (GAME_STATUS.isSubCommand()) {
-    let result = SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).update(keyboard);
+  if (game_status.isSubCommand()) {
+    let result = sub_commands.get(game_status.getSubCommand()).update(keyboard);
     if (result === 'menu') {
-      GAME_STATUS.setMenu();
+      game_status.setMenu();
       // Update any settings that may have changed
       refreshSettings();
     }
@@ -4280,37 +4271,37 @@ function update(dt) {
   }
 
 
-  if (GAME_STATUS.isGameOver()) {
-    if (HIGH_SCORE.checkHighScore(GAME_STATUS.getScore())) {
-      HIGH_SCORE.setHighScore(GAME_STATUS.getScore());
-      GAME_STATUS.setSubCommand('highscore');
-      SUB_COMMANDS.get('highscore').select();
+  if (game_status.isGameOver()) {
+    if (high_score.checkHighScore(game_status.getScore())) {
+      high_score.setHighScore(game_status.getScore());
+      game_status.setSubCommand('highscore');
+      sub_commands.get('highscore').select();
     }
     else {
-      GAME_STATUS.setShowScore();
+      game_status.setShowScore();
     }
   }
 
 
   // If status is not running then we give option to start or quit
-  if (GAME_STATUS.isNewGame() || GAME_STATUS.isScoreShown()) {
+  if (game_status.isNewGame() || game_status.isScoreShown()) {
     // Display instructions (in draw() rather than here)
     // If jump / duck then go to menu
-    if (GAME_CONTROLS.isOrPressed(keyboard, ['jump', 'duck'])) {
+    if (game_controls.isOrPressed(keyboard, ['jump', 'duck'])) {
       // Reset player and game including score
       player.reset();
-      GAME_STATUS.reset();
-      GAME_STATUS.setMenu();
+      game_status.reset();
+      game_status.setMenu();
       // Reset number of obstacles etc.
-      set_level_display(GAME_STATUS.getLevel());
+      set_level_display(game_status.getLevel());
     }
 
     return;
   }
 
 
-  if (GAME_STATUS.isGameRunning && (GAME_STATUS.getTimeRemaining() < 1)) {
-    GAME_STATUS.setGameOver();
+  if (game_status.isGameRunning && (game_status.getTimeRemaining() < 1)) {
+    game_status.setGameOver();
     return;
   }
 
@@ -4319,7 +4310,7 @@ function update(dt) {
 
   // Has player hit an obstacle?
   if (hit_obstacle()) {
-    GAME_STATUS.setGameOver();
+    game_status.setGameOver();
     return;
   }
 
@@ -4327,7 +4318,7 @@ function update(dt) {
 }
 
 function on_mouse_move(pos) {
-  if (GAME_STATUS.isMenu()) {
+  if (game_status.isMenu()) {
     menu.mouse_move(pos);
   }
 }
@@ -4337,20 +4328,20 @@ function on_mouse_down(pos, button) {
   if ((button & mouse.LEFT) <= 0) {
     return;
   }
-  if (GAME_STATUS.isMenu()) {
+  if (game_status.isMenu()) {
     menu.mouse_click(pos);
   }
   // If status waiting on click to go to menu allow this to be mouse
-  if (GAME_STATUS.isNewGame() || GAME_STATUS.isScoreShown()) {
+  if (game_status.isNewGame() || game_status.isScoreShown()) {
     // Reset player including score
     player.reset();
-    GAME_STATUS.setMenu();
+    game_status.setMenu();
     // Reset number of obstacles etc.
-    set_level_display(GAME_STATUS.getLevel());
+    set_level_display(game_status.getLevel());
   }
   // If sub command pass on to command
-  if (GAME_STATUS.isSubCommand()) {
-    SUB_COMMANDS.get(GAME_STATUS.getSubCommand()).mouse_click(pos);
+  if (game_status.isSubCommand()) {
+    sub_commands.get(game_status.getSubCommand()).mouse_click(pos);
   }
 }
 
@@ -4359,17 +4350,17 @@ function on_mouse_down(pos, button) {
  */
 function check_position() {
   // Determine if player has reached where they should be
-  if (reach_target(GAME_STATUS.getCurrentMove())) {
-    let current_level = GAME_STATUS.getLevel(),
-        new_level = GAME_STATUS.scorePoint();
+  if (reach_target(game_status.getCurrentMove())) {
+    let current_level = game_status.getLevel(),
+        new_level = game_status.scorePoint();
 
     // If level changed when adding point
     if (current_level !== new_level) {
       //Move player back to center for level up
       player.setPosition(WIDTH / 2, HEIGHT / 2);
       player.setDirection('down');
-      GAME_STATUS.setGameMessage("Level Up!\n" + new_level);
-      GAME_STATUS.startTimerPause();
+      game_status.setGameMessage("Level Up!\n" + new_level);
+      game_status.startTimerPause();
       set_level_display(new_level);
     }
   }
@@ -4386,33 +4377,33 @@ function handle_keyboard() {
   let new_direction = '';
 
   // Check for pause button first
-  if (GAME_CONTROLS.isPressed(keyboard, 'pause')) {
-    GAME_STATUS.setUserPause();
+  if (game_controls.isPressed(keyboard, 'pause')) {
+    game_status.setUserPause();
   }
 
   // Duck or Jump - don't move character, but change image
   // Allow two different keys for both these
-  if (GAME_CONTROLS.isPressed(keyboard, 'duck')) {
+  if (game_controls.isPressed(keyboard, 'duck')) {
     new_direction = 'duck';
   }
-  else if (GAME_CONTROLS.isPressed(keyboard, 'jump')) {
+  else if (game_controls.isPressed(keyboard, 'jump')) {
     new_direction = 'jump';
     // Only handle direction buttons if duck or jump have not been selected (prevent ducking constantly and moving)
   }
   else {
-    if (GAME_CONTROLS.isPressed(keyboard, 'up')) {
+    if (game_controls.isPressed(keyboard, 'up')) {
       new_direction = 'up';
       player.moveActor(new_direction);
     }
-    if (GAME_CONTROLS.isPressed(keyboard, 'down')) {
+    if (game_controls.isPressed(keyboard, 'down')) {
       new_direction = 'down';
       player.moveActor(new_direction);
     }
-    if (GAME_CONTROLS.isPressed(keyboard, 'left')) {
+    if (game_controls.isPressed(keyboard, 'left')) {
       new_direction = 'left';
       player.moveActor(new_direction);
     }
-    if (GAME_CONTROLS.isPressed(keyboard, 'right')) {
+    if (game_controls.isPressed(keyboard, 'right')) {
       new_direction = 'right';
       player.moveActor(new_direction);
     }
@@ -4525,7 +4516,7 @@ function get_background_img(game_level) {
  * Update any settings that may have changed during a menu operation
  */
 function refreshSettings() {
-  player.setTheme(SUB_COMMANDS.get('character').getTheme());
+  player.setTheme(sub_commands.get('character').getTheme());
 }
 
 window.addEventListener('load', (event) => {
