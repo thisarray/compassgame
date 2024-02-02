@@ -3450,7 +3450,6 @@ class CustomCharacter {
   // Previews are the current variations of the themes, these may be reloaded when a new custom character is created
   loadPreviews() {
     // Reset values from previous load
-/*
     this.current_themes = [["person1", 0], ["person2", 0]];
     this.current_theme_actors = [];
 
@@ -3463,9 +3462,6 @@ class CustomCharacter {
       this.current_theme_actors.push(actor);
       xpos += 100;
     }
-*/
-    this.current_themes = [];
-    this.current_theme_actors = [];
   }
 
   draw(screen) {
@@ -3495,7 +3491,7 @@ class CustomCharacter {
       return;
     }
     let ypos = 100,
-        list_keys = this.theme_config.getKey(),
+        list_keys = this.theme_config.getKeys(),
         key;
     for (let i = 0; i < list_keys.length; i++) {
       key = list_keys[i];
@@ -3746,8 +3742,11 @@ class CustomCharacter {
       this.selected_col = this.checkColPos(this.selected_col, this.selected_row);
     }
     if (this.game_controls.isPressed(keyboard, 'down')) {
+      // Disable custom characters
+/*
       this.selected_row = 1;
       this.selected_col = this.checkColPos(this.selected_col, this.selected_row);
+*/
     }
     if (this.game_controls.isPressed(keyboard, 'right')) {
       this.selected_col = this.checkColPos(this.selected_col + 1, this.selected_row);
@@ -3768,7 +3767,7 @@ class CustomCharacter {
         this.selected_row_custom = 0;
         this.selected_colour_custom = -1;
 
-        this.customize_theme = this.available_themes[this.selected_col];
+        this.customize_theme = this.available_themes[this.selected_col][0];
         this.status = STATUS_CUSTOM;
         this.preview = new Actor(PlayerActor.getImage(this.customize_theme, 0, "down", 1));
         this.preview.pos = [700, 150];
