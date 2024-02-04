@@ -2804,13 +2804,29 @@ class HighScore {
 
   // Reads high scores from file and stores as lists
   loadHighScore() {
-    // Unable to read to file - warn to console
-    if (HighScore.DEBUG) {
-      console.log("Unable to read file  high scores will be reset\n");
+    let file = localStorage.getItem('compassgame_score'),
+        entries;
+    if ((typeof file === 'string') && (file.length > 0)) {
+      entries = file.split('\n');
+      for (let line of entries) {
+        let [this_name, this_score_str] = line.split(',', 2),
+            this_score_num = parseInt(this_score_str, 10);
+        this.high_score_values.push(this_score_num);
+        this.high_score_names.push(this_name);
+      }
     }
-    // If either doesn't exist or is corrupt add single dummy entry
-    this.high_score_values.push(0);
-    this.high_score_names.push("---");
+    else {
+      // Unable to read to file - warn to console
+      if (HighScore.DEBUG) {
+        console.log("Unable to read file  high scores will be reset\n");
+      }
+    }
+
+    if (this.high_score_values.length <= 0) {
+      // If either doesn't exist or is corrupt add single dummy entry
+      this.high_score_values.push(0);
+      this.high_score_names.push("---");
+    }
   }
 
   // Checks if high score is achieved
@@ -2840,10 +2856,11 @@ class HighScore {
   }
 
   saveHighScore() {
-    // Unable to write to file - warn to console
-    if (HighScore.DEBUG) {
-      console.log("Unable to write to file  high scores will not be saved\n");
+    let result = [];
+    for (let i = 0; i < this.high_score_values.length; i++) {
+      result.push(this.high_score_names[i] + "," + this.high_score_values[i].toFixed());
     }
+    localStorage.setItem('compassgame_score', result.join("\n"));
   }
 
   draw(screen) {
