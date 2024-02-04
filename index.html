@@ -3975,6 +3975,13 @@ class CustomControls {
 
   // Checks pygame event queue for last key pressed
   checkKey(keyboard) {
+    // Check all keycodes to see if any are high
+    for (const keycode of Object.getOwnPropertyNames(keys)) {
+      let this_code = keys[keycode];
+      if (keyboard[this_code]) {
+        return this_code;
+      }
+    }
     return null;
   }
 
