@@ -2714,7 +2714,8 @@ const DEFAULT_KEYS = new Map([
  * Allows multiple key options for each key (eg. space and enter for jump / duck)
  */
 class GameControls {
-  constructor() {
+  constructor(filename) {
+    this.filename = filename;
     this.loadControls();
   }
 
@@ -2779,7 +2780,7 @@ class HighScore {
 
   static MAX_ENTRIES = 10;
 
-  constructor(game_controls) {
+  constructor(game_controls, filename) {
     // Values is score as int and names is name of user (3 initials)
     // Must be ordered high to low
     this.high_score_values = [];
@@ -2790,6 +2791,7 @@ class HighScore {
     this.mode = 'display';
 
     this.game_controls = game_controls;
+    this.filename = filename;
     // Setup high score when created
     this.loadHighScore();
     // Timer restrict keyboard movements to fraction of second (prevent multiple presses)
@@ -2804,9 +2806,10 @@ class HighScore {
 
   // Reads high scores from file and stores as lists
   loadHighScore() {
-    let file = localStorage.getItem('compassgame_score'),
+    let file = localStorage.getItem(this.filename),
         entries;
     if ((typeof file === 'string') && (file.length > 0)) {
+      // Open file if it already exists
       entries = file.split('\n');
       for (let line of entries) {
         let [this_name, this_score_str] = line.split(',', 2),
@@ -2818,7 +2821,7 @@ class HighScore {
     else {
       // Unable to read to file - warn to console
       if (HighScore.DEBUG) {
-        console.log("Unable to read file  high scores will be reset\n");
+        console.log("Unable to read file " + this.filename + " high scores will be reset\n");
       }
     }
 
@@ -2860,7 +2863,7 @@ class HighScore {
     for (let i = 0; i < this.high_score_values.length; i++) {
       result.push(this.high_score_names[i] + "," + this.high_score_values[i].toFixed());
     }
-    localStorage.setItem('compassgame_score', result.join("\n"));
+    localStorage.setItem(this.filename, result.join("\n"));
   }
 
   draw(screen) {
@@ -4107,6 +4110,16 @@ const BACKGROUND_NUM_IMGS = 2;
 const OBSTACLE_NUM_IMGS = 6;
 
 /*
+ * File holding high score
+ */
+const HIGH_SCORE_FILENAME = 'compassgame_score.dat';
+
+/*
+ * File holding custom controls
+ */
+const CUSTOM_CONTROL_FILENAME  = 'compassgame_controls.dat';
+
+/*
  * Dictionary with messages to show to user for action to carry out
  */
 const ACTION_TEXT = new Map([
@@ -4136,10 +4149,10 @@ function reset() {
   // Track Status etc
   game_status = new GamePlay(ACTION_TEXT);
   // Handles key interaction
-  game_controls = new GameControls();
+  game_controls = new GameControls(CUSTOM_CONTROL_FILENAME);
 
   // Track high score
-  high_score = new HighScore(game_controls);
+  high_score = new HighScore(game_controls, HIGH_SCORE_FILENAME);
 
   // These are used for the menu sub commands - must be classes
   // Must implement show() display() mouse_move() and mouse_click() select()
