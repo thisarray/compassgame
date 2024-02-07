@@ -2716,20 +2716,38 @@ const DEFAULT_KEYS = new Map([
 class GameControls {
   constructor(filename) {
     this.filename = filename;
+    this.configured_keys = new Map();
+    for (const [key, value] of DEFAULT_KEYS) {
+      this.configured_keys.set(key, value);
+    }
     this.loadControls();
   }
 
   // Controls (if it exists) is a pickle file
   loadControls() {
+    let file = localStorage.getItem(this.filename),
+        result;
     this.configured_keys = new Map();
-    for (const [key, value] of DEFAULT_KEYS) {
-      this.configured_keys.set(key, value);
+    if ((typeof file === 'string') && (file.length > 0)) {
+      result = JSON.parse(file);
+      for (const key of Object.getOwnPropertyNames(result)) {
+        this.configured_keys.set(key, result[key]);
+      }
+    }
+    else {
+      for (const [key, value] of DEFAULT_KEYS) {
+        this.configured_keys.set(key, value);
+      }
     }
   }
 
   // Replaces current file with configured_keys
   saveControls() {
-    console.log("Save custom controls failed");
+    let result = {};
+    for (const [key, value] of this.configured_keys) {
+      result[key] = value;
+    }
+    localStorage.setItem(this.filename, JSON.stringify(result));
   }
 
   // Returns True if the key is pressed, else false
